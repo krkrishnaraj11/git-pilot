@@ -9,10 +9,12 @@ mod model_manager;
 mod rebase;
 mod scanner;
 mod sidecar;
+mod watcher;
 
 use db::DbState;
 use model_manager::DownloadCancelFlag;
 use sidecar::LlamaServerState;
+use watcher::FsWatcherState;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
@@ -29,6 +31,7 @@ pub fn run() {
             app.manage(DbState(Mutex::new(conn)));
             app.manage(LlamaServerState::new());
             app.manage(DownloadCancelFlag(Arc::new(AtomicBool::new(false))));
+            app.manage(FsWatcherState::new());
 
             // Auto-start llama-server if setup is complete
             let handle = app.handle().clone();
@@ -144,6 +147,9 @@ pub fn run() {
             rebase::execute_rebase,
             rebase::continue_rebase,
             rebase::abort_rebase,
+            // File system watcher
+            watcher::start_watching,
+            watcher::stop_watching,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

@@ -88,7 +88,7 @@ fn get_staged_diff_text(repo_path: &str) -> Result<String, String> {
 
         diff.print(git2::DiffFormat::Patch, |_delta, _hunk, line| {
             if text.len() > MAX_DIFF_CHARS {
-                return false;
+                return true; // skip writing but don't error
             }
             let prefix = match line.origin() {
                 '+' => "+",

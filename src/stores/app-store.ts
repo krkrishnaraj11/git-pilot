@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import type {
   RepoInfo,
   ScannedIdentity,
@@ -252,6 +253,13 @@ export const useAppStore = create<AppState>((set, get) => ({
         set({ isScanning: false });
       }
     }
+
+    // Start file system watcher on this path
+    try {
+      await invoke("start_watching", { path });
+    } catch (e) {
+      console.warn("Failed to start fs watcher:", e);
+    }
   },
 
   pickFolder: async () => {
@@ -395,6 +403,14 @@ export const useAppStore = create<AppState>((set, get) => ({
         const lastPath = await invoke<string | null>("get_setting", { key: "last_scan_path" });
         if (lastPath) {
           await get().scanDirectory(lastPath);
+        }
+      });
+
+      // Listen for filesystem changes to auto-rescan
+      listen("fs-repos-changed", () => {
+        const scanPath = get().scanPath;
+        if (scanPath && !get().isScanning) {
+          get().scanDirectory(scanPath);
         }
       });
 
