@@ -608,6 +608,64 @@ pub fn create_branch(
 }
 
 // ═══════════════════════════════════════════════════════════════
+// 10b. checkout_remote_branch
+// ═══════════════════════════════════════════════════════════════
+
+#[tauri::command]
+pub fn checkout_remote_branch(repo_path: String, remote_branch: String) -> Result<bool, String> {
+    let repo = Repository::open(&repo_path).map_err(|e| e.to_string())?;
+
+    // remote_branch is like "origin/feature-x" — extract the local name
+    let local_name = remote_branch
+        .split('/')
+        .skip(1)
+        .collect::<Vec<&str>>()
+        .join("/");
+
+    if local_name.is_empty() {
+        return Err(format!("Invalid remote branch name: {}", remote_branch));
+    }
+
+    // Check if local branch already exists
+    if repo.find_branch(&local_name, git2::BranchType::Local).is_ok() {
+        // Just switch to it
+        let obj = repo
+            .revparse_single(&format!("refs/heads/{}", local_name))
+            .map_err(|e| e.to_string())?;
+        repo.checkout_tree(&obj, None).map_err(|e| e.to_string())?;
+        repo.set_head(&format!("refs/heads/{}", local_name))
+            .map_err(|e| e.to_string())?;
+        return Ok(true);
+    }
+
+    // Resolve the remote ref to a commit
+    let remote_ref = repo
+        .revparse_single(&format!("refs/remotes/{}", remote_branch))
+        .map_err(|e| format!("Remote branch '{}' not found: {}", remote_branch, e))?;
+    let commit = remote_ref.peel_to_commit().map_err(|e| e.to_string())?;
+
+    // Create local branch tracking the remote
+    let mut branch = repo
+        .branch(&local_name, &commit, false)
+        .map_err(|e| e.to_string())?;
+
+    // Set upstream tracking
+    branch
+        .set_upstream(Some(&remote_branch))
+        .map_err(|e| e.to_string())?;
+
+    // Checkout the new branch
+    let obj = repo
+        .revparse_single(&format!("refs/heads/{}", local_name))
+        .map_err(|e| e.to_string())?;
+    repo.checkout_tree(&obj, None).map_err(|e| e.to_string())?;
+    repo.set_head(&format!("refs/heads/{}", local_name))
+        .map_err(|e| e.to_string())?;
+
+    Ok(true)
+}
+
+// ═══════════════════════════════════════════════════════════════
 // 11. delete_branch
 // ═══════════════════════════════════════════════════════════════
 

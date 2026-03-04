@@ -1,10 +1,9 @@
 import { useAppStore } from "@/stores/app-store";
-import { cn } from "@/lib/utils";
 
-const TOAST_STYLES = {
-  success: { bg: "bg-gp-success/8", border: "border-gp-success/15", text: "text-gp-success", dot: "bg-gp-success" },
-  error: { bg: "bg-gp-danger/8", border: "border-gp-danger/15", text: "text-gp-danger", dot: "bg-gp-danger" },
-  info: { bg: "bg-gp-info/8", border: "border-gp-info/15", text: "text-gp-info", dot: "bg-gp-info" },
+const TOAST_COLORS = {
+  success: { bg: "rgba(16, 185, 129, 0.1)", border: "rgba(16, 185, 129, 0.2)", text: "#10B981", dot: "#10B981" },
+  error: { bg: "rgba(239, 68, 68, 0.1)", border: "rgba(239, 68, 68, 0.2)", text: "#EF4444", dot: "#EF4444" },
+  info: { bg: "rgba(59, 130, 246, 0.1)", border: "rgba(59, 130, 246, 0.2)", text: "#3B82F6", dot: "#3B82F6" },
 };
 
 export function ToastContainer() {
@@ -14,25 +13,76 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-14 right-5 z-[100] flex flex-col gap-2 pointer-events-none">
+    <div
+      style={{
+        position: "fixed",
+        bottom: "56px",
+        right: "20px",
+        zIndex: 100,
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        pointerEvents: "none",
+      }}
+    >
       {toasts.map((toast) => {
-        const style = TOAST_STYLES[toast.type];
+        const colors = TOAST_COLORS[toast.type];
         return (
           <div
             key={toast.id}
-            className={cn(
-              "pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-md animate-fade-in-up",
-              style.bg,
-              style.border
-            )}
+            style={{
+              pointerEvents: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "12px 18px",
+              borderRadius: "14px",
+              border: `1px solid ${colors.border}`,
+              background: colors.bg,
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              animation: "spotlightIn 0.2s ease",
+              minWidth: "240px",
+              maxWidth: "420px",
+            }}
           >
-            <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", style.dot)} />
-            <span className={cn("text-[12px] font-medium", style.text)}>{toast.message}</span>
+            {/* Status icon */}
+            {toast.type === "success" ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.dot} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            ) : toast.type === "error" ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.dot} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.dot} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+            )}
+
+            <span style={{ fontSize: "13px", fontWeight: 600, color: colors.text, flex: 1 }}>
+              {toast.message}
+            </span>
+
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-gp-text-tertiary hover:text-gp-text transition-colors ml-2 shrink-0"
+              style={{
+                background: "none",
+                border: "none",
+                padding: "4px",
+                cursor: "pointer",
+                color: "var(--color-gp-text-tertiary)",
+                flexShrink: 0,
+                borderRadius: "6px",
+                transition: "all 0.15s ease",
+              }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>

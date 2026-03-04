@@ -85,6 +85,16 @@ interface AppState {
   rebaseWizardOpen: boolean;
   backupManagerOpen: boolean;
 
+  // Sync (push/pull) modal
+  syncOp: {
+    type: "push" | "pull";
+    status: "running" | "success" | "error";
+    repoName: string;
+    branch: string;
+    message?: string;
+    detail?: string;
+  } | null;
+
   // Toast
   toasts: Toast[];
 
@@ -129,6 +139,7 @@ interface AppState {
   doPush: (repoPath: string) => Promise<void>;
   doPull: (repoPath: string) => Promise<void>;
   switchBranch: (repoPath: string, branchName: string) => Promise<void>;
+  checkoutRemoteBranch: (repoPath: string, remoteBranch: string) => Promise<void>;
   createBranch: (repoPath: string, branchName: string, fromBranch?: string) => Promise<void>;
   deleteBranch: (repoPath: string, branchName: string) => Promise<void>;
   stashSave: (repoPath: string, message?: string) => Promise<void>;
@@ -221,6 +232,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   mergeWizardOpen: false,
   rebaseWizardOpen: false,
   backupManagerOpen: false,
+
+  // Sync modal
+  syncOp: null,
 
   // Toast
   toasts: [],
@@ -550,33 +564,41 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   doPush: async (repoPath) => {
+    const repo = get().selectedRepo || get().allRepos.find((r) => r.path === repoPath);
+    const repoName = repo?.name || repoPath.split("/").pop() || "repo";
+    const branch = repo?.branch || "unknown";
+    set({ syncOp: { type: "push", status: "running", repoName, branch } });
     try {
       const result = await invoke<PushResult>("push", { repoPath });
       if (result.success) {
-        get().addToast("success", "Pushed successfully");
+        set({ syncOp: { type: "push", status: "success", repoName, branch, message: "Pushed successfully" } });
         const scanPath = get().scanPath;
         if (scanPath) get().scanDirectory(scanPath);
       } else {
-        get().addToast("error", result.error || "Push failed");
+        set({ syncOp: { type: "push", status: "error", repoName, branch, message: "Push failed", detail: result.error || undefined } });
       }
     } catch (e) {
-      get().addToast("error", `Push failed: ${e}`);
+      set({ syncOp: { type: "push", status: "error", repoName, branch, message: "Push failed", detail: `${e}` } });
     }
   },
 
   doPull: async (repoPath) => {
+    const repo = get().selectedRepo || get().allRepos.find((r) => r.path === repoPath);
+    const repoName = repo?.name || repoPath.split("/").pop() || "repo";
+    const branch = repo?.branch || "unknown";
+    set({ syncOp: { type: "pull", status: "running", repoName, branch } });
     try {
       const result = await invoke<PullResult>("pull", { repoPath });
       if (result.success) {
-        get().addToast("success", `Pulled ${result.commits_pulled} commit(s)`);
+        set({ syncOp: { type: "pull", status: "success", repoName, branch, message: `Pulled ${result.commits_pulled} commit(s)` } });
         await get().loadRepoCommits(repoPath);
         const scanPath = get().scanPath;
         if (scanPath) get().scanDirectory(scanPath);
       } else {
-        get().addToast("error", result.error || "Pull failed");
+        set({ syncOp: { type: "pull", status: "error", repoName, branch, message: "Pull failed", detail: result.error || undefined } });
       }
     } catch (e) {
-      get().addToast("error", `Pull failed: ${e}`);
+      set({ syncOp: { type: "pull", status: "error", repoName, branch, message: "Pull failed", detail: `${e}` } });
     }
   },
 
@@ -590,6 +612,20 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (scanPath) get().scanDirectory(scanPath);
     } catch (e) {
       get().addToast("error", `Switch failed: ${e}`);
+    }
+  },
+
+  checkoutRemoteBranch: async (repoPath, remoteBranch) => {
+    try {
+      await invoke("checkout_remote_branch", { repoPath, remoteBranch });
+      const localName = remoteBranch.split("/").slice(1).join("/");
+      get().addToast("success", `Checked out ${localName} from ${remoteBranch}`);
+      await get().loadRepoBranches(repoPath);
+      await get().loadRepoDiff(repoPath);
+      const scanPath = get().scanPath;
+      if (scanPath) get().scanDirectory(scanPath);
+    } catch (e) {
+      get().addToast("error", `Checkout failed: ${e}`);
     }
   },
 
@@ -624,7 +660,12 @@ export const useAppStore = create<AppState>((set, get) => ({
       await get().loadRepoStashes(repoPath);
       await get().loadRepoDiff(repoPath);
     } catch (e) {
-      get().addToast("error", `Stash failed: ${e}`);
+      const msg = `${e}`;
+      if (msg.includes("nothing to stash")) {
+        get().addToast("info", "Nothing to stash — no local changes");
+      } else {
+        get().addToast("error", `Stash failed: ${msg}`);
+      }
     }
   },
 

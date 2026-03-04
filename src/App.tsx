@@ -16,6 +16,7 @@ import { ToastContainer } from "@/components/ToastContainer";
 import { AiCommitPanel } from "@/components/AiCommitPanel";
 import { MergeWizard, RebaseWizard } from "@/components/MergeWizard";
 import { BackupManager } from "@/components/BackupManager";
+import { SyncModal } from "@/components/SyncModal";
 import { SplashScreen } from "@/components/SplashScreen";
 import { SetupWizard } from "@/components/SetupWizard";
 
@@ -81,6 +82,7 @@ function App() {
   const mergeWizardOpen = useAppStore((s) => s.mergeWizardOpen);
   const rebaseWizardOpen = useAppStore((s) => s.rebaseWizardOpen);
   const backupManagerOpen = useAppStore((s) => s.backupManagerOpen);
+  const syncOp = useAppStore((s) => s.syncOp);
   const aiPanelOpen = useAiStore((s) => s.aiPanelOpen);
 
   const needsSetup = useSetupStore((s) => s.needsSetup);
@@ -152,6 +154,7 @@ function App() {
       {mergeWizardOpen && <MergeWizard />}
       {rebaseWizardOpen && <RebaseWizard />}
       {backupManagerOpen && <BackupManager />}
+      {syncOp && <SyncModal />}
       <ToastContainer />
     </div>
   );

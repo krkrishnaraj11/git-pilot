@@ -107,6 +107,7 @@ pub fn run() {
             git_ops::get_branches,
             git_ops::switch_branch,
             git_ops::create_branch,
+            git_ops::checkout_remote_branch,
             git_ops::delete_branch,
             git_ops::get_commit_log,
             git_ops::get_stashes,

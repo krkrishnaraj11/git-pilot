@@ -6,6 +6,7 @@ export function BranchManager() {
   const selectedRepo = useAppStore((s) => s.selectedRepo);
   const branches = useAppStore((s) => s.repoBranches);
   const switchBranch = useAppStore((s) => s.switchBranch);
+  const checkoutRemoteBranch = useAppStore((s) => s.checkoutRemoteBranch);
   const createBranch = useAppStore((s) => s.createBranch);
   const deleteBranch = useAppStore((s) => s.deleteBranch);
   const setMergeWizardOpen = useAppStore((s) => s.setMergeWizardOpen);
@@ -284,6 +285,13 @@ export function BranchManager() {
                   </button>
                   <button onClick={() => deleteBranch(selectedRepo.path, branch.name)} style={actionBtnStyle("#EF4444")}>
                     Delete
+                  </button>
+                </div>
+              )}
+              {!isCurrent && branch.is_remote && (
+                <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                  <button onClick={() => checkoutRemoteBranch(selectedRepo.path, branch.name)} style={actionBtnStyle("#8B5CF6")}>
+                    Checkout
                   </button>
                 </div>
               )}
