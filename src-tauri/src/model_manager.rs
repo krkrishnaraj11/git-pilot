@@ -101,23 +101,37 @@ fn get_bin_dir(app: &AppHandle) -> Result<std::path::PathBuf, String> {
     Ok(bin_dir)
 }
 
+/// Returns the name of the llama-server binary for the current platform.
+fn llama_server_binary_name() -> &'static str {
+    if cfg!(target_os = "windows") {
+        "llama-server.exe"
+    } else {
+        "llama-server"
+    }
+}
+
 /// Returns the path to a working llama-server binary, or None.
 pub fn find_llama_server(app: &AppHandle) -> Option<String> {
+    let bin_name = llama_server_binary_name();
+
     // 1. Check app data bin dir (downloaded by setup)
     if let Ok(bin_dir) = get_bin_dir(app) {
-        let bundled = bin_dir.join("llama-server");
+        let bundled = bin_dir.join(bin_name);
         if bundled.exists() {
             return Some(bundled.to_string_lossy().to_string());
         }
     }
 
     // 2. Check PATH
-    if let Ok(output) = std::process::Command::new("which")
+    let which_cmd = if cfg!(target_os = "windows") { "where" } else { "which" };
+    if let Ok(output) = std::process::Command::new(which_cmd)
         .arg("llama-server")
         .output()
     {
         if output.status.success() {
             let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            // `where` on Windows may return multiple lines; take the first
+            let path = path.lines().next().unwrap_or("").trim().to_string();
             if !path.is_empty() {
                 return Some(path);
             }
@@ -144,6 +158,11 @@ fn get_llama_server_download_url() -> (&'static str, &'static str) {
             "https://github.com/ggml-org/llama.cpp/releases/latest/download/llama-server-v1.29.2-bin-ubuntu-x64.zip",
             "llama-server",
         )
+    } else if cfg!(target_os = "windows") && cfg!(target_arch = "x86_64") {
+        (
+            "https://github.com/ggml-org/llama.cpp/releases/latest/download/llama-server-v1.29.2-bin-win-avx2-x64.zip",
+            "llama-server.exe",
+        )
     } else {
         ("", "llama-server")
     }
@@ -168,8 +187,9 @@ pub fn ensure_llama_server(app: AppHandle) -> Result<String, String> {
         return Err("No llama-server binary available for this platform. Install llama.cpp manually.".to_string());
     }
 
+    let bin_name = llama_server_binary_name();
     let bin_dir = get_bin_dir(&app)?;
-    let target_path = bin_dir.join("llama-server");
+    let target_path = bin_dir.join(bin_name);
 
     let _ = app.emit("llama-server-download-status", "Downloading AI engine...");
 
@@ -202,15 +222,32 @@ pub fn ensure_llama_server(app: AppHandle) -> Result<String, String> {
     std::fs::write(&zip_path, &bytes)
         .map_err(|e| format!("Failed to write zip: {}", e))?;
 
-    // Extract using system unzip
-    let output = std::process::Command::new("unzip")
-        .arg("-o")
-        .arg(&zip_path)
-        .arg("-d")
-        .arg(&temp_dir)
-        .output()
-        .map_err(|e| format!("Failed to extract zip: {}", e))?;
+    // Extract using platform-appropriate tool
+    #[cfg(target_os = "windows")]
+    let extract_result = {
+        std::process::Command::new("powershell")
+            .args([
+                "-NoProfile",
+                "-Command",
+                &format!(
+                    "Expand-Archive -Path '{}' -DestinationPath '{}' -Force",
+                    zip_path.to_string_lossy(),
+                    temp_dir.to_string_lossy()
+                ),
+            ])
+            .output()
+    };
+    #[cfg(not(target_os = "windows"))]
+    let extract_result = {
+        std::process::Command::new("unzip")
+            .arg("-o")
+            .arg(&zip_path)
+            .arg("-d")
+            .arg(&temp_dir)
+            .output()
+    };
 
+    let output = extract_result.map_err(|e| format!("Failed to extract zip: {}", e))?;
     if !output.status.success() {
         let _ = std::fs::remove_dir_all(&temp_dir);
         return Err(format!(
@@ -219,36 +256,29 @@ pub fn ensure_llama_server(app: AppHandle) -> Result<String, String> {
         ));
     }
 
-    // Find llama-server binary in extracted files
-    let mut found = false;
-    if let Ok(entries) = std::fs::read_dir(&temp_dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.is_dir() {
-                // Check inside subdirectory (e.g., build/bin/llama-server)
-                let candidates = [
-                    path.join("llama-server"),
-                    path.join("bin").join("llama-server"),
-                    path.join("build").join("bin").join("llama-server"),
-                ];
-                for candidate in &candidates {
-                    if candidate.exists() {
-                        std::fs::copy(candidate, &target_path)
-                            .map_err(|e| format!("Failed to copy binary: {}", e))?;
-                        found = true;
-                        break;
+    // Find llama-server binary in extracted files (recursive search)
+    fn find_binary_recursive(
+        dir: &std::path::Path,
+        bin_name: &str,
+        target: &std::path::Path,
+    ) -> Result<bool, String> {
+        if let Ok(entries) = std::fs::read_dir(dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_dir() {
+                    if find_binary_recursive(&path, bin_name, target)? {
+                        return Ok(true);
                     }
+                } else if path.file_name().map(|n| n == bin_name).unwrap_or(false) {
+                    std::fs::copy(&path, target)
+                        .map_err(|e| format!("Failed to copy binary: {}", e))?;
+                    return Ok(true);
                 }
-            } else if path.file_name().map(|n| n == "llama-server").unwrap_or(false) {
-                std::fs::copy(&path, &target_path)
-                    .map_err(|e| format!("Failed to copy binary: {}", e))?;
-                found = true;
-            }
-            if found {
-                break;
             }
         }
+        Ok(false)
     }
+    let found = find_binary_recursive(&temp_dir, bin_name, &target_path)?;
 
     // Cleanup temp
     let _ = std::fs::remove_dir_all(&temp_dir);
