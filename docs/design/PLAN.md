@@ -267,9 +267,9 @@ New files: Sidebar, RepoListTable/RepoRow + useVirtualList, CommandPalette, Oper
 ## Phase status tracker
 | Phase | Status |
 |---|---|
-| 0 — Persist plan + baseline | ⬜ pending |
-| 1 — Tokens, fonts, icons, primitives | ⬜ pending |
-| 2 — App shell | ⬜ pending |
+| 0 — Persist plan + baseline | ✅ done (d19825b, 2026-10-18) |
+| 1 — Tokens, fonts, icons, primitives | ✅ done (9df4627, 2026-10-18) |
+| 2 — App shell | 🟡 code committed (afc0a7b, 2026-10-18); visual verification pending — user has further UI issues to report |
 | 3 — Repo list table | ⬜ pending |
 | 4 — Repo detail | ⬜ pending |
 | 5 — Startup, walkthrough, AI runner | ⬜ pending |
