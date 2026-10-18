@@ -146,10 +146,10 @@ New files: Sidebar, RepoListTable/RepoRow + useVirtualList, CommandPalette, Oper
   1. Replace `@theme` in index.css with Nocturne tokens (table above) + type-scale vars; keep animation keyframes for now (cleanup in phase 9); add global `:focus-visible` ring; scrollbar tokens.
   2. package.json: add `@fontsource/inter`, `@phosphor-icons/react`, `@radix-ui/react-popover`; remove plus-jakarta-sans + lucide-react. Update index.css font imports.
   3. Build primitives in `src/components/ui/`: Button (primary = accent-outlined, secondary, ghost, danger-outline; sizes sm/md), IconButton, Tag (state variants from tint tokens), Input, SegmentedControl, Kbd, StatusDot, Panel, Popover (Radix wrapper), TrayCard shell. CVA-based like existing code.
-  4. Migrate all `gp-*` class usages to new token names (grep for `gp-`, replace) — mechanical rename across components; app should look Nocturne but behavior unchanged.
-  5. Replace lucide icons with Phosphor equivalents across all components (mechanical).
-- **Files:** index.css, package.json, new `src/components/ui/*` (~10 files), all components (token/icon renames).
-- **DoD:** app runs with Nocturne palette; zero `gp-*` classes and zero lucide imports remain; primitives used by at least TitleBar/StatusBar.
+  4. Token aliasing (deviation, decided in-session): redefine the legacy `--color-gp-*` tokens inside @theme with Nocturne values, so all 25 existing components (most deleted/rewritten in phases 2–8) pick up the new palette with zero class changes. New code uses canonical token names (ground/panel/surface/text/muted/accent/state). Aliases removed in phase 9.
+  5. lucide-react is an unused dep (0 imports — icons are inline SVGs): remove from package.json; Phosphor is used in new/rewritten components.
+- **Files:** index.css, package.json, new `src/components/ui/*` (~10 files), ToastContainer (restyle with primitives + Phosphor).
+- **DoD:** app runs with Nocturne palette (via aliases); build green; primitives used by ToastContainer; no hard-coded hex in new code.
 - **Commit:** `feat(theme): Nocturne tokens, Inter + Phosphor, shared UI primitives`
 
 ### Phase 2 — App shell
@@ -252,7 +252,7 @@ New files: Sidebar, RepoListTable/RepoRow + useVirtualList, CommandPalette, Oper
 - **Steps:**
   1. Empty/error/offline states per design language: no repos found (folder picker CTA), engine not running (title bar + AI menu + commit pane fallback: manual message), repo path moved, push rejected (tray recovery).
   2. Delete all replaced components + unused styles/animations in index.css; remove plus-jakarta dep if any residue.
-  3. Grep audit: zero hard-coded hex outside index.css; zero `gp-*` classes; no dead imports.
+  3. Grep audit: zero hard-coded hex outside index.css; remove `gp-*` alias tokens from @theme (zero `gp-` references anywhere); no dead imports.
   4. Update README (new structure, tokens, how to run) + CHANGELOG entry: removed components, new settings keys (ai_runner, ai_model, backup retention, entitlements), migrations (identity color, runner/model).
   5. Final: `tsc` + vite build + `tauri build`; pixel-check every artboard at 1440×900 and 1120×720.
 - **DoD:** overall definition of done (below).
