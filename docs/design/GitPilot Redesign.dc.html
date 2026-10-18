@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/nocturne-a31fcc8e-92eb-468d-b149-41e3e9b62d4d/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>body{background:#0d0e17;font-feature-settings:"tnum","cv11"} a{color:#b5abfc} a:hover{color:#d2cefd}</style>
+</helmet>
+<section style="display:flex;flex-direction:column;gap:64px;padding:64px;width:1568px;font-family:Inter,system-ui,sans-serif;color:#e9e9ed">
+
+<!-- 1a RATIONALE -->
+<div id="1a" style="display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">1a</span><span style="font-size:13px;color:#9397ab">Direction, pushbacks, system</span></div>
+<div style="display:grid;grid-template-columns:1.1fr 1fr;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<h1 style="font-size:44px;margin:0">Quiet instrument panel.</h1>
+<p style="font-size:16px;line-height:1.6;color:#cfd3e5;margin:0;max-width:600px">GitPilot is opened dozens of times a day to answer one question: <em style="font-style:normal;color:#e9e9ed">what needs my attention, and what is the one action?</em> The direction is IDE-native and flat-utilitarian on the Nocturne system: a dense, keyboard-driven list, a sidebar for scope, no decoration that is not data. Color is reserved for state and identity, so a glance down the column is a reading, not a scan.</p>
+<h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9397ab;margin:12px 0 0">Where I disagree with the current design</h4>
+<sc-for list="{{ pushbacks }}" as="p" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:28px 1fr;gap:12px;padding-top:12px;border-top:1px solid #292b31">
+<span style="font:500 12px 'JetBrains Mono';color:#796cbf;padding-top:3px">{{ p.n }}</span>
+<div><div style="font-size:14px;font-weight:500;color:#e9e9ed">{{ p.t }}</div><div style="font-size:13px;line-height:1.55;color:#9397ab;margin-top:3px">{{ p.d }}</div></div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:28px">
+<div>
+<h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9397ab;margin:0 0 12px">Color: dark-first, light-ready</h4>
+<p style="font-size:13px;line-height:1.55;color:#9397ab;margin:0 0 14px">Dark stays the default (long sessions, diffs, matches terminal and editor). Every color below is a semantic token on the Nocturne ramps, so a light theme is a remap of the same roles, planned for v1.1 rather than shipped half-done.</p>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+<sc-for list="{{ swatches }}" as="s" hint-placeholder-count="9">
+<div style="border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31;padding:10px;display:flex;flex-direction:column;gap:8px">
+<div style="height:28px;border-radius:4px;background:{{ s.c }}"></div>
+<div style="font-size:12px;font-weight:500">{{ s.n }}</div>
+<div style="font:400 11px 'JetBrains Mono';color:#75798c">{{ s.c }} · {{ s.r }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+<div>
+<h4 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9397ab;margin:0 0 12px">Type: Inter for UI, JetBrains Mono for data</h4>
+<div style="display:flex;flex-direction:column;gap:2px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31;border-radius:8px;padding:6px 14px">
+<sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:90px 1fr 120px;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid #232532">
+<span style="font:400 11px 'JetBrains Mono';color:#75798c">{{ t.k }}</span>
+<span style="font-family:{{ t.f }};font-size:{{ t.s }}px;font-weight:{{ t.w }};color:#e9e9ed">{{ t.x }}</span>
+<span style="font:400 11px 'JetBrains Mono';color:#75798c;text-align:right">{{ t.m }}</span>
+</div>
+</sc-for>
+</div>
+<p style="font-size:12px;color:#75798c;margin:10px 0 0">Minimum 12px, sentence case, no letter-spaced micro-labels except the sidebar section captions.</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 1b REPO LIST -->
+<div id="1b" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">1b</span><span style="font-size:13px;color:#9397ab">Repository list: interactive (scope, state filter, group by identity, select row)</span></div>
+<div style="width:1440px;height:900px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;font-size:13px">
+
+<!-- titlebar -->
+<div style="height:40px;flex:none;display:grid;grid-template-columns:1fr 440px 1fr;align-items:center;background:#111320;border-bottom:1px solid #232532;padding:0 14px">
+<div style="display:flex;align-items:center;gap:8px">
+<span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span>
+<span style="width:1px;height:16px;background:#292b31;margin:0 8px"></span>
+<i class="ph-fill ph-compass" style="font-size:16px;color:#9184d9"></i><span style="font-weight:500">GitPilot</span>
+</div>
+<div style="height:26px;border-radius:6px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31;display:flex;align-items:center;gap:8px;padding:0 10px;color:#75798c">
+<i class="ph ph-magnifying-glass" style="font-size:14px"></i><span style="flex:1">Search repos, branches, commands</span>
+<span style="font:400 11px 'JetBrains Mono';border:1px solid #3f424d;border-radius:4px;padding:0 5px;color:#9397ab">⌘K</span>
+</div>
+<div style="display:flex;align-items:center;justify-content:flex-end;gap:14px;color:#9397ab">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#62b98a"></span>Claude ready</span>
+<span style="display:flex;align-items:center;gap:6px;color:#e9e9ed"><i class="ph ph-arrow-clockwise" style="font-size:15px"></i>Rescanned 2m ago</span>
+<i class="ph ph-gear" style="font-size:16px"></i>
+</div>
+</div>
+
+<div style="flex:1;display:flex;min-height:0">
+<!-- sidebar -->
+<div style="width:232px;flex:none;background:#111320;border-right:1px solid #232532;display:flex;flex-direction:column;padding:14px 8px;gap:2px">
+<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#75798c;padding:0 10px 6px">Identity</div>
+<sc-for list="{{ scopes }}" as="s" hint-placeholder-count="4">
+<div onClick="{{ s.pick }}" style="height:30px;border-radius:6px;display:flex;align-items:center;gap:10px;padding:0 10px;cursor:pointer;background:{{ s.bg }};color:{{ s.fg }}" style-hover="background:#1b1d2c">
+<span style="width:8px;height:8px;border-radius:2px;background:{{ s.c }}"></span>
+<span style="flex:1">{{ s.n }}</span>
+<span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ s.count }}</span>
+</div>
+</sc-for>
+<div style="margin:6px 10px 10px;padding:8px 10px;border-radius:6px;background:#2a2417;color:#d9a24f;display:flex;gap:8px;line-height:1.4;font-size:12px"><i class="ph ph-warning" style="font-size:15px;margin-top:1px"></i><span>2 repos use an email that does not match their identity rule.</span></div>
+<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#75798c;padding:12px 10px 6px">Library</div>
+<div style="height:30px;display:flex;align-items:center;gap:10px;padding:0 10px;color:#b2b6ca"><i class="ph ph-archive" style="font-size:16px"></i>Backups</div>
+<div style="height:30px;display:flex;align-items:center;gap:10px;padding:0 10px;color:#b2b6ca"><i class="ph ph-clock-counter-clockwise" style="font-size:16px"></i>Audit log</div>
+<div style="height:30px;display:flex;align-items:center;gap:10px;padding:0 10px;color:#b2b6ca"><i class="ph ph-identification-card" style="font-size:16px"></i>Identity rules</div>
+<div style="flex:1"></div>
+<div style="padding:10px;border-top:1px solid #232532;color:#75798c;font:400 11px/1.5 'JetBrains Mono'">~/dev<br>22 repos · 3 identities</div>
+</div>
+
+<!-- main -->
+<div style="flex:1;display:flex;flex-direction:column;min-width:0">
+<!-- toolbar -->
+<div style="height:48px;flex:none;display:flex;align-items:center;gap:16px;padding:0 20px;border-bottom:1px solid #232532">
+<div style="display:flex;gap:2px;padding:2px;border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31">
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+<div onClick="{{ f.pick }}" style="height:26px;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 10px;cursor:pointer;background:{{ f.bg }};color:{{ f.fg }}">
+<span style="width:6px;height:6px;border-radius:50%;background:{{ f.c }}"></span><span>{{ f.n }}</span><span style="font:400 12px 'JetBrains Mono';opacity:.7">{{ f.count }}</span>
+</div>
+</sc-for>
+</div>
+<div style="flex:1"></div>
+<div onClick="{{ toggleGroup }}" style="height:28px;border-radius:6px;display:flex;align-items:center;gap:8px;padding:0 10px;cursor:pointer;box-shadow:0 0 0 1px {{ groupRing }};color:{{ groupFg }}"><i class="ph ph-rows" style="font-size:15px"></i>Group by identity</div>
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:8px;padding:0 10px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-sort-ascending" style="font-size:15px"></i>Last activity<i class="ph ph-caret-down" style="font-size:12px;color:#75798c"></i></div>
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:8px;padding:0 12px;box-shadow:0 0 0 1px #796cbf;color:#d2cefd"><i class="ph ph-folder-simple-plus" style="font-size:15px"></i>Add folder</div>
+</div>
+
+<!-- header -->
+<div style="height:28px;flex:none;display:grid;grid-template-columns:40px minmax(240px,1fr) 190px 210px 100px 80px 110px;align-items:center;padding:0 20px 0 12px;color:#75798c;font-size:12px;border-bottom:1px solid #232532">
+<span></span><span>Repository</span><span>Branch</span><span>Working tree</span><span>Remote</span><span>Activity</span><span style="text-align:right">Next</span>
+</div>
+
+<!-- rows -->
+<div style="flex:1;overflow:auto;min-height:0">
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+<div>
+<sc-if value="{{ r.isGroup }}" hint-placeholder-val="{{ false }}">
+<div style="height:30px;display:flex;align-items:center;gap:10px;padding:0 20px;background:#13152100;color:#b2b6ca;border-bottom:1px solid #232532;margin-top:6px">
+<span style="width:8px;height:8px;border-radius:2px;background:{{ r.c }}"></span><span style="font-weight:500;color:#e9e9ed">{{ r.name }}</span><span style="color:#75798c">{{ r.email }}</span><span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ r.n }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ r.isRepo }}" hint-placeholder-val="{{ true }}">
+<div onClick="{{ r.pick }}" style="height:32px;display:grid;grid-template-columns:40px minmax(240px,1fr) 190px 210px 100px 80px 110px;align-items:center;padding:0 20px 0 10px;cursor:pointer;background:{{ r.bg }};box-shadow:inset 2px 0 0 {{ r.bar }};border-bottom:1px solid #1b1d2c" style-hover="background:#1b1d2c">
+<span style="display:flex;justify-content:center"><span style="width:8px;height:8px;border-radius:2px;background:{{ r.c }}"></span></span>
+<span style="display:flex;align-items:baseline;gap:10px;min-width:0"><span style="font-weight:500;color:#f3f5fe;white-space:nowrap">{{ r.name }}</span><span style="font:400 11px 'JetBrains Mono';color:#595d6c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.path }}</span><i class="ph-fill ph-warning" style="font-size:13px;color:#d9a24f;display:{{ r.mmShow }}"></i></span>
+<span style="display:flex;align-items:center;gap:6px;font:400 12px 'JetBrains Mono';color:#b2b6ca;min-width:0"><i class="ph ph-git-branch" style="font-size:14px;color:#75798c"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.branch }}</span></span>
+<span style="display:flex;align-items:center;gap:14px;font:400 12px 'JetBrains Mono'">
+<span style="display:{{ r.chgShow }};align-items:center;gap:5px;color:#d9a24f"><i class="ph ph-pencil-simple" style="font-size:13px"></i>{{ r.chg }}</span>
+<span style="display:{{ r.stgShow }};align-items:center;gap:5px;color:#6f9ae0"><i class="ph ph-check-square" style="font-size:13px"></i>{{ r.stg }}</span>
+<span style="display:{{ r.cfShow }};align-items:center;gap:5px;color:#e0706f"><i class="ph-fill ph-lightning" style="font-size:13px"></i>conflict</span>
+<span style="display:{{ r.cleanShow }};color:#595d6c">clean</span>
+</span>
+<span style="display:flex;align-items:center;gap:12px;font:400 12px 'JetBrains Mono'">
+<span style="display:{{ r.ahdShow }};align-items:center;gap:3px;color:#62b98a"><i class="ph ph-arrow-up" style="font-size:12px"></i>{{ r.ahd }}</span>
+<span style="display:{{ r.bhdShow }};align-items:center;gap:3px;color:#e0706f"><i class="ph ph-arrow-down" style="font-size:12px"></i>{{ r.bhd }}</span>
+<span style="display:{{ r.syncedShow }};color:#595d6c">synced</span>
+</span>
+<span style="color:#75798c;font-size:12px">{{ r.last }}</span>
+<span style="display:flex;justify-content:flex-end"><span style="display:{{ r.actShow }};height:22px;align-items:center;gap:5px;border-radius:5px;padding:0 9px;font-size:12px;box-shadow:0 0 0 1px {{ r.actC }};color:{{ r.actFg }}">{{ r.act }}</span></span>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+
+<!-- status bar -->
+<div style="height:28px;flex:none;display:flex;align-items:center;gap:20px;padding:0 20px;background:#111320;border-top:1px solid #232532;font-size:12px;color:#75798c">
+<span style="font-family:'JetBrains Mono'">{{ shownText }}</span>
+<span style="flex:1"></span>
+<span><span style="font:400 11px 'JetBrains Mono';border:1px solid #3f424d;border-radius:3px;padding:0 4px;color:#9397ab">↑↓</span> move</span>
+<span><span style="font:400 11px 'JetBrains Mono';border:1px solid #3f424d;border-radius:3px;padding:0 4px;color:#9397ab">⏎</span> open</span>
+<span><span style="font:400 11px 'JetBrains Mono';border:1px solid #3f424d;border-radius:3px;padding:0 4px;color:#9397ab">C</span> commit</span>
+<span><span style="font:400 11px 'JetBrains Mono';border:1px solid #3f424d;border-radius:3px;padding:0 4px;color:#9397ab">P</span> push</span>
+<span style="display:flex;align-items:center;gap:6px;color:#62b98a"><i class="ph ph-shield-check" style="font-size:14px"></i>Backups on</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 1c DETAIL -->
+<div id="1c" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">1c</span><span style="font-size:13px;color:#9397ab">Repo detail: changes, diff and AI commit in one three-pane view</span></div>
+<div style="width:1440px;height:900px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;font-size:13px">
+<div style="height:40px;flex:none;display:grid;grid-template-columns:1fr 440px 1fr;align-items:center;background:#111320;border-bottom:1px solid #232532;padding:0 14px">
+<div style="display:flex;align-items:center;gap:8px">
+<span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span>
+<span style="width:1px;height:16px;background:#292b31;margin:0 8px"></span>
+<i class="ph-fill ph-compass" style="font-size:16px;color:#9184d9"></i><span style="font-weight:500">GitPilot</span>
+</div>
+<div style="height:26px;border-radius:6px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31;display:flex;align-items:center;gap:8px;padding:0 10px;color:#75798c"><i class="ph ph-magnifying-glass" style="font-size:14px"></i><span style="flex:1">Search repos, branches, commands</span><span style="font:400 11px 'JetBrains Mono';border:1px solid #3f424d;border-radius:4px;padding:0 5px;color:#9397ab">⌘K</span></div>
+<div style="display:flex;align-items:center;justify-content:flex-end;gap:14px;color:#9397ab"><span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#62b98a"></span>Claude ready</span><i class="ph ph-gear" style="font-size:16px"></i></div>
+</div>
+
+<!-- repo header -->
+<div style="height:64px;flex:none;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid #232532">
+<div style="display:flex;align-items:center;gap:8px;color:#9397ab"><i class="ph ph-arrow-left" style="font-size:16px"></i><span style="width:8px;height:8px;border-radius:2px;background:#9184d9"></span><span>Work</span><span style="color:#595d6c">/</span></div>
+<h3 style="font-size:20px;margin:0">billing-service</h3>
+<span style="display:flex;align-items:center;gap:6px;height:24px;border-radius:5px;padding:0 9px;background:#232532;font:400 12px 'JetBrains Mono';color:#cfd3e5"><i class="ph ph-git-branch" style="font-size:14px"></i>feat/invoice-retry<i class="ph ph-caret-down" style="font-size:11px;color:#75798c"></i></span>
+<span style="font:400 12px 'JetBrains Mono';color:#62b98a">↑0</span><span style="font:400 12px 'JetBrains Mono';color:#595d6c">↓0</span>
+<span style="flex:1"></span>
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 11px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-arrows-clockwise" style="font-size:15px"></i>Fetch</div>
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 11px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-git-merge" style="font-size:15px"></i>Merge…</div>
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 11px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-git-pull-request" style="font-size:15px"></i>Rebase…</div>
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 11px;box-shadow:0 0 0 1px #796cbf;color:#d2cefd"><i class="ph ph-arrow-up" style="font-size:15px"></i>Push</div>
+</div>
+<div style="height:36px;flex:none;display:flex;align-items:stretch;gap:22px;padding:0 20px;border-bottom:1px solid #232532;color:#9397ab">
+<div style="display:flex;align-items:center;gap:7px;color:#e9e9ed;box-shadow:inset 0 -2px 0 #9184d9">Changes<span style="font:400 12px 'JetBrains Mono';color:#9397ab">9</span></div>
+<div style="display:flex;align-items:center">History</div><div style="display:flex;align-items:center">Branches<span style="font:400 12px 'JetBrains Mono';margin-left:7px;color:#75798c">6</span></div><div style="display:flex;align-items:center">Backups</div><div style="display:flex;align-items:center">Activity</div>
+</div>
+
+<div style="flex:1;display:grid;grid-template-columns:300px 1fr 340px;min-height:0">
+<!-- files -->
+<div style="border-right:1px solid #232532;background:#111320;display:flex;flex-direction:column;min-height:0">
+<div style="height:34px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 14px;color:#b2b6ca;border-bottom:1px solid #1b1d2c"><span style="font-weight:500">Staged</span><span style="font:400 12px 'JetBrains Mono';color:#6f9ae0">2</span></div>
+<sc-for list="{{ staged }}" as="f" hint-placeholder-count="2">
+<div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 14px;background:{{ f.bg }}"><span style="font:500 11px 'JetBrains Mono';color:{{ f.c }};width:12px">{{ f.s }}</span><span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ f.d }}</span><span style="font:400 12px 'JetBrains Mono';color:#e9e9ed">{{ f.n }}</span></div>
+</sc-for>
+<div style="height:34px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 14px;color:#b2b6ca;border-bottom:1px solid #1b1d2c;border-top:1px solid #1b1d2c;margin-top:8px"><span style="font-weight:500">Changes</span><span style="font:400 12px 'JetBrains Mono';color:#d9a24f">7</span></div>
+<sc-for list="{{ unstaged }}" as="f" hint-placeholder-count="7">
+<div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 14px"><span style="font:500 11px 'JetBrains Mono';color:{{ f.c }};width:12px">{{ f.s }}</span><span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ f.d }}</span><span style="font:400 12px 'JetBrains Mono';color:#cfd3e5">{{ f.n }}</span></div>
+</sc-for>
+</div>
+<!-- diff -->
+<div style="display:flex;flex-direction:column;min-width:0;min-height:0">
+<div style="height:34px;flex:none;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid #232532;font:400 12px 'JetBrains Mono';color:#9397ab"><span>src/invoices/</span><span style="color:#e9e9ed">retry.ts</span><span style="flex:1"></span><span style="color:#62b98a">+18</span><span style="color:#e0706f">−4</span></div>
+<div style="flex:1;overflow:hidden;font:400 12.5px/22px 'JetBrains Mono'">
+<sc-for list="{{ diff }}" as="l" hint-placeholder-count="14">
+<div style="display:grid;grid-template-columns:44px 44px 1fr;background:{{ l.bg }};color:{{ l.fg }}"><span style="text-align:right;padding-right:10px;color:#595d6c">{{ l.a }}</span><span style="text-align:right;padding-right:10px;color:#595d6c">{{ l.b }}</span><span style="white-space:pre;padding-left:8px;box-shadow:inset 2px 0 0 {{ l.bar }}">{{ l.t }}</span></div>
+</sc-for>
+</div>
+</div>
+<!-- AI commit -->
+<div style="border-left:1px solid #232532;background:#111320;padding:16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:8px;font-weight:500"><i class="ph ph-sparkle" style="font-size:16px;color:#9184d9"></i>Commit message<span style="flex:1"></span><span style="font-size:12px;font-weight:400;color:#9397ab">from 2 staged files</span></div>
+<div style="border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #3f424d;padding:12px;display:flex;flex-direction:column;gap:10px">
+<div style="font:500 13px 'JetBrains Mono';color:#f3f5fe;line-height:1.45">fix(billing): retry failed invoice sends with backoff</div>
+<div style="font:400 12px/1.6 'JetBrains Mono';color:#b2b6ca">Retries up to 5 times with exponential delay and jitter. Permanent SMTP errors are not retried.</div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 11px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-arrows-clockwise" style="font-size:14px"></i>Regenerate</div>
+<div style="height:28px;border-radius:6px;display:flex;align-items:center;padding:0 11px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5">Shorter</div>
+</div>
+<div style="display:flex;gap:8px;align-items:flex-start;padding:10px;border-radius:6px;background:#17261f;color:#62b98a;font-size:12px;line-height:1.45"><i class="ph ph-check-circle" style="font-size:15px;margin-top:1px"></i><span>Committing as Krishna R &lt;krishna@acme.com&gt;<br><span style="color:#9397ab">Matches the Work identity rule for this folder.</span></span></div>
+<div style="flex:1"></div>
+<div style="height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 0 1px #9184d9;color:#d2cefd;font-weight:500">Commit 2 files<span style="font:400 11px 'JetBrains Mono';border:1px solid #5d5294;border-radius:3px;padding:0 4px;color:#b5abfc">⌘⏎</span></div>
+<div style="height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9397ab;box-shadow:0 0 0 1px #292b31">Commit and push</div>
+</div>
+</div>
+</div>
+</div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { scope: -1, filter: 'all', group: false, sel: 'billing-service' };
+  renderVals() {
+    const ids = [
+      { n: 'Work', e: 'krishna@acme.com', c: '#9184d9', d: 'work/acme' },
+      { n: 'Personal', e: 'krishna.dev@gmail.com', c: '#6bb5a6', d: 'personal' },
+      { n: 'Freelance', e: 'hello@krishna.studio', c: '#c79a8a', d: 'clients' }
+    ];
+    const raw = `billing-service|0|feat/invoice-retry|7|2|0|0|0|4m|0
+web-app|0|main|0|0|0|3|0|18m|0
+infra-terraform|0|fix/vpc-peering|0|0|3|0|0|1h|0
+auth-gateway|0|release/2.4|2|0|0|0|1|35m|0
+data-pipeline|0|main|0|0|0|0|0|2d|0
+mobile-app|0|feat/onboarding|14|5|0|2|0|26m|0
+design-tokens|0|main|0|0|1|0|0|3h|0
+ops-runbooks|0|main|0|0|0|0|0|9d|0
+payments-sdk|0|develop|3|0|0|0|0|1h|1
+internal-cli|0|main|0|0|0|1|0|5h|0
+dotfiles|1|main|1|0|0|0|0|12m|0
+blog|1|draft/git-internals|5|0|0|0|0|2h|0
+homelab|1|main|0|0|2|0|0|1d|0
+rust-playground|1|main|0|0|0|0|0|6d|0
+recipes-app|1|feat/search|0|3|0|0|0|3d|0
+advent-of-code|1|main|0|0|0|0|0|11mo|0
+nvim-config|1|main|0|0|0|4|0|2d|0
+photo-archive|1|main|0|0|0|0|0|3w|0
+client-landing|2|redesign|9|0|0|0|0|50m|0
+shopify-theme|2|main|0|0|1|0|0|2d|0
+cms-migration|2|migrate/v2|0|0|0|0|0|1w|0
+invoice-tool|2|main|0|1|0|0|0|4d|1`;
+    const all = raw.split('\n').map(l => {
+      const p = l.split('|'); const id = +p[1];
+      const o = { name: p[0], id, branch: p[2], chg: +p[3], stg: +p[4], ahd: +p[5], bhd: +p[6], cf: +p[7], last: p[8], mm: +p[9] };
+      o.path = '~/dev/' + ids[id].d + '/' + o.name;
+      o.attn = o.chg || o.stg || o.ahd || o.bhd || o.cf;
+      return o;
+    });
+    const st = this.state;
+    const scoped = all.filter(r => st.scope < 0 || r.id === st.scope);
+    const fdefs = [
+      ['all', 'All', '#9397ab', r => true],
+      ['changed', 'Changed', '#d9a24f', r => r.chg || r.stg],
+      ['ahead', 'Ahead', '#62b98a', r => r.ahd],
+      ['behind', 'Behind', '#e0706f', r => r.bhd],
+      ['conflict', 'Conflicts', '#e0706f', r => r.cf],
+      ['clean', 'Clean', '#595d6c', r => !r.attn]
+    ];
+    const filters = fdefs.map(f => ({
+      n: f[1], c: f[2], count: scoped.filter(f[3]).length,
+      bg: st.filter === f[0] ? '#2b2741' : 'transparent', fg: st.filter === f[0] ? '#e7e5fe' : '#b2b6ca',
+      pick: () => this.setState({ filter: f[0] })
+    }));
+    const fn = fdefs.find(f => f[0] === st.filter)[3];
+    let list = scoped.filter(fn);
+    const rank = r => r.cf ? 0 : (r.chg || r.stg) ? 1 : r.ahd ? 2 : r.bhd ? 3 : 4;
+    const toRow = r => {
+      const act = r.cf ? ['Resolve', '#e0706f', '#e0706f'] : (r.chg || r.stg) ? ['Commit', '#796cbf', '#d2cefd'] : r.ahd ? ['Push', '#796cbf', '#d2cefd'] : r.bhd ? ['Pull', '#595d6c', '#cfd3e5'] : null;
+      const sel = st.sel === r.name; const d = v => v ? 'flex' : 'none';
+      return { isRepo: true, isGroup: false, name: r.name, path: r.path, branch: r.branch, c: ids[r.id].c, last: r.last, chg: r.chg, stg: r.stg, ahd: r.ahd, bhd: r.bhd,
+        chgShow: d(r.chg), stgShow: d(r.stg), cfShow: d(r.cf), cleanShow: (r.chg || r.stg || r.cf) ? 'none' : 'block',
+        ahdShow: d(r.ahd), bhdShow: d(r.bhd), syncedShow: (r.ahd || r.bhd) ? 'none' : 'block', mmShow: r.mm ? 'inline' : 'none',
+        act: act ? act[0] : '', actC: act ? act[1] : 'transparent', actFg: act ? act[2] : '', actShow: act ? 'flex' : 'none',
+        bg: sel ? '#2b274199' : 'transparent', bar: sel ? '#9184d9' : 'transparent', pick: () => this.setState({ sel: r.name }) };
+    };
+    let rows = [];
+    if (st.group) {
+      ids.forEach((idn, i) => {
+        const g = list.filter(r => r.id === i).sort((a, b) => rank(a) - rank(b));
+        if (!g.length) return;
+        rows.push({ isGroup: true, isRepo: false, name: idn.n, email: idn.e, c: idn.c, n: g.length });
+        g.forEach(r => rows.push(toRow(r)));
+      });
+    } else {
+      list = list.slice().sort((a, b) => rank(a) - rank(b));
+      rows = list.map(toRow);
+    }
+    const scopes = [{ n: 'All identities', c: '#595d6c', count: all.length, i: -1 }].concat(ids.map((x, i) => ({ n: x.n, c: x.c, count: all.filter(r => r.id === i).length, i }))).map(s => ({
+      ...s, bg: st.scope === s.i ? '#2b2741' : 'transparent', fg: st.scope === s.i ? '#f5f4ff' : '#cfd3e5', pick: () => this.setState({ scope: s.i })
+    }));
+    const pushbacks = [
+      { n: '01', t: 'Cards to a dense list', d: 'A card shows 4 facts in 170px of height, so 30 repos need several screens. A 32px row shows 22 repos at once, aligns every column for vertical comparison, and sorts by urgency.' },
+      { n: '02', t: 'Identity is a scope, not the hierarchy', d: 'Grouping by identity forces you to scroll past clean repos to find dirty ones. Identity becomes a sidebar scope, a color marker per row, and an optional group-by toggle. State is the default sort.' },
+      { n: '03', t: 'No hover-reveal actions', d: 'Hidden actions cost a mouse move per repo and do not exist for keyboard users. Each row shows its single next action (Commit, Push, Pull, Resolve) at all times; everything else is in the detail view or ⌘K.' },
+      { n: '04', t: 'Identity mismatch is a safety state', d: 'Committing with the wrong email is the problem identities exist to prevent. It is a row marker, a sidebar notice and a commit-time check, not a banner above the list.' },
+      { n: '05', t: 'Chrome carries information', d: 'The live clock goes; the OS has one. The title bar holds search (⌘K), AI status and scan recency. The five-pill stat strip becomes one segmented filter with counts, orthogonal to the identity scope.' }
+    ];
+    const swatches = [
+      { n: 'Ground', c: '#161826', r: 'bg' }, { n: 'Panel', c: '#111320', r: 'sidebar, titlebar' }, { n: 'Surface', c: '#1b1d2c', r: 'inputs, hover' },
+      { n: 'Accent', c: '#9184d9', r: 'selection, focus' }, { n: 'Text', c: '#e9e9ed', r: 'primary' }, { n: 'Muted', c: '#75798c', r: 'neutral-600' },
+      { n: 'Changed', c: '#d9a24f', r: 'uncommitted' }, { n: 'Staged', c: '#6f9ae0', r: 'staged' }, { n: 'Ahead / ok', c: '#62b98a', r: 'ahead, safe' },
+      { n: 'Behind / error', c: '#e0706f', r: 'behind, conflict' }, { n: 'Personal', c: '#6bb5a6', r: 'identity' }, { n: 'Freelance', c: '#c79a8a', r: 'identity' }
+    ];
+    const typeScale = [
+      { k: 'Title 20/500', f: 'Inter', s: 20, w: 500, x: 'billing-service', m: 'screen title' },
+      { k: 'Body 13/400', f: 'Inter', s: 13, w: 400, x: 'Retries up to 5 times', m: 'UI, rows' },
+      { k: 'Label 12/400', f: 'Inter', s: 12, w: 400, x: 'Working tree', m: 'headers, meta' },
+      { k: 'Data 12/400', f: "'JetBrains Mono'", s: 12, w: 400, x: 'feat/invoice-retry  ↑2 ↓1', m: 'branch, counts' },
+      { k: 'Diff 12.5/22', f: "'JetBrains Mono'", s: 12.5, w: 400, x: 'const delay = base * 2 ** n', m: 'code' }
+    ];
+    const F = (s, d, n, stg) => ({ s, d, n, c: s === 'A' ? '#62b98a' : s === 'D' ? '#e0706f' : '#d9a24f', bg: n === 'retry.ts' ? '#2b274166' : 'transparent' });
+    const staged = [F('M', 'src/invoices/', 'retry.ts'), F('A', 'src/invoices/', 'backoff.ts')];
+    const unstaged = [F('M', 'src/invoices/', 'send.ts'), F('M', 'src/queue/', 'worker.ts'), F('M', 'src/config/', 'env.ts'), F('M', 'test/', 'retry.test.ts'), F('M', '', 'package.json'), F('D', 'src/legacy/', 'mailer.js'), F('M', 'docs/', 'invoices.md')];
+    const L = (a, b, t, k) => ({ a, b, t, bg: k === '+' ? '#17261f' : k === '-' ? '#2a1c20' : k === '@' ? '#1b1d2c' : 'transparent', fg: k === '@' ? '#75798c' : '#cfd3e5', bar: k === '+' ? '#62b98a' : k === '-' ? '#e0706f' : 'transparent' });
+    const diff = [
+      L('', '', '@@ -12,9 +12,23 @@ export async function sendInvoice(id: string)', '@'),
+      L(12, 12, 'import { backoff } from "./backoff";', ' '),
+      L(13, 13, '', ' '),
+      L(14, 14, 'export async function sendWithRetry(inv: Invoice) {', ' '),
+      L(15, '', '  try {', '-'),
+      L(16, '', '    return await send(inv);', '-'),
+      L('', 15, '  const max = 5;', '+'),
+      L('', 16, '  for (let n = 0; n < max; n++) {', '+'),
+      L('', 17, '    try {', '+'),
+      L('', 18, '      return await send(inv);', '+'),
+      L('', 19, '    } catch (err) {', '+'),
+      L('', 20, '      if (isPermanent(err) || n === max - 1) throw err;', '+'),
+      L('', 21, '      await sleep(backoff(n));', '+'),
+      L('', 22, '    }', '+'),
+      L(17, 23, '  } catch (err) {', '-'),
+      L(18, 24, '    log.error("invoice send failed", { id: inv.id });', ' '),
+      L(19, 25, '    throw err;', ' '),
+      L(20, 26, '  }', ' '),
+      L(21, 27, '}', ' ')
+    ];
+    return { rows, filters, scopes, pushbacks, swatches, typeScale, staged, unstaged, diff,
+      toggleGroup: () => this.setState(s => ({ group: !s.group })),
+      groupRing: st.group ? '#796cbf' : '#3f424d', groupFg: st.group ? '#d2cefd' : '#cfd3e5',
+      shownText: `${list.length} of ${all.length} repos` };
+  }
+}
+</script>
+</body>
+</html>

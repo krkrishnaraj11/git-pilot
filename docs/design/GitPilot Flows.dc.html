@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/nocturne-a31fcc8e-92eb-468d-b149-41e3e9b62d4d/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>body{background:#0d0e17;font-feature-settings:"tnum","cv11"} a{color:#b5abfc} a:hover{color:#d2cefd}</style>
+</helmet>
+<section style="display:flex;flex-direction:column;gap:56px;padding:64px;width:1568px;font-family:Inter,system-ui,sans-serif;color:#e9e9ed;font-size:13px">
+
+<div style="display:flex;flex-direction:column;gap:8px">
+<h1 style="font-size:32px;margin:0">Flows: first run, AI engine, merge, library</h1>
+<p style="margin:0;color:#9397ab;max-width:760px;line-height:1.55">Same language as <a href="GitPilot Redesign.dc.html">the list and detail screens</a>. Modals are replaced by full-window workspaces (merge, library) and an operation tray (push/pull). The AI engine is runner-agnostic: the built-in engine, Ollama, LM Studio or any OpenAI-compatible endpoint, with Gemma models as the default.</p>
+</div>
+
+<!-- 2a SPLASH -->
+<div id="2a" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2a</span><span style="color:#9397ab">Startup</span></div>
+<div style="width:1120px;height:720px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#111320;border-bottom:1px solid #232532"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span></div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 0 0 220px;gap:36px;background:radial-gradient(ellipse 500px 360px at 30% 55%,#2b274133,transparent)">
+<div style="display:flex;align-items:center;gap:16px"><i class="ph-fill ph-compass" style="font-size:44px;color:#9184d9"></i><div><div style="font-size:28px;font-weight:500;letter-spacing:-.015em">GitPilot</div><div style="color:#75798c;margin-top:2px">Git identities and operations, on your machine</div></div></div>
+<div style="width:380px;display:flex;flex-direction:column;gap:18px">
+<div style="height:2px;background:#232532;border-radius:2px"><div style="width:60%;height:2px;background:#9184d9;border-radius:2px"></div></div>
+<sc-for list="{{ boot }}" as="b" hint-placeholder-count="5">
+<div style="display:flex;align-items:center;gap:12px;color:{{ b.fg }}"><i class="{{ b.icon }}" style="font-size:16px;color:{{ b.ic }}"></i><span style="flex:1">{{ b.t }}</span><span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ b.m }}</span></div>
+</sc-for>
+</div>
+</div>
+<div style="height:36px;display:flex;align-items:center;padding:0 20px;color:#595d6c;font:400 11px 'JetBrains Mono'">v1.0.0</div>
+</div>
+</div>
+
+<!-- 2b WELCOME -->
+<div id="2b" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2b</span><span style="color:#9397ab">Walkthrough 1 of 4: welcome</span></div>
+<div style="width:1120px;height:720px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#111320;border-bottom:1px solid #232532"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span><span style="flex:1;text-align:center;color:#75798c">Set up GitPilot</span><span style="width:52px"></span></div>
+<div style="flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0">
+<div style="background:#111320;border-right:1px solid #232532;padding:32px 24px;display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:28px"><i class="ph-fill ph-compass" style="font-size:22px;color:#9184d9"></i><span style="font-size:16px;font-weight:500">GitPilot</span></div>
+<sc-for list="{{ railB }}" as="s" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;height:34px;color:{{ s.fg }}"><span style="width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px {{ s.ring }};background:{{ s.bg }};display:flex;align-items:center;justify-content:center;font:500 11px 'JetBrains Mono'"><i class="{{ s.icon }}" style="font-size:12px"></i>{{ s.num }}</span>{{ s.t }}</div></sc-for>
+</div>
+<div style="padding:72px 80px;display:flex;flex-direction:column;gap:28px;background:radial-gradient(ellipse 480px 320px at 90% 0%,#2b274128,transparent)">
+<div><h2 style="font-size:34px;margin:0 0 12px;max-width:520px">Know the state of every repository.</h2><p style="color:#9397ab;font-size:15px;line-height:1.6;margin:0;max-width:520px">Scan a folder, see what needs attention, and make sure each commit goes out under the right identity. Setup takes about two minutes.</p></div>
+<div style="display:flex;flex-direction:column;max-width:560px">
+<sc-for list="{{ features }}" as="f" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:36px 1fr;gap:14px;padding:14px 0;border-top:1px solid #232532"><i class="{{ f.i }}" style="font-size:22px;color:#9184d9"></i><div><div style="font-weight:500;font-size:14px">{{ f.t }}</div><div style="color:#9397ab;line-height:1.5;margin-top:2px">{{ f.d }}</div></div></div></sc-for>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;gap:20px"><div style="height:36px;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 18px;box-shadow:0 0 0 1px #9184d9;color:#e7e5fe;font-weight:500">Continue<i class="ph ph-arrow-right" style="font-size:15px"></i></div><span style="color:#75798c">Skip setup</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2c FIND REPOS -->
+<div id="2c" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2c</span><span style="color:#9397ab">Walkthrough 2 of 4: find repos and identities (new step, replaces the empty-state "Scan Folder" button)</span></div>
+<div style="width:1120px;height:720px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#111320;border-bottom:1px solid #232532"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span><span style="flex:1;text-align:center;color:#75798c">Set up GitPilot</span><span style="width:52px"></span></div>
+<div style="flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0">
+<div style="background:#111320;border-right:1px solid #232532;padding:32px 24px;display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:28px"><i class="ph-fill ph-compass" style="font-size:22px;color:#9184d9"></i><span style="font-size:16px;font-weight:500">GitPilot</span></div>
+<sc-for list="{{ railC }}" as="s" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;height:34px;color:{{ s.fg }}"><span style="width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px {{ s.ring }};background:{{ s.bg }};display:flex;align-items:center;justify-content:center;font:500 11px 'JetBrains Mono'"><i class="{{ s.icon }}" style="font-size:12px"></i>{{ s.num }}</span>{{ s.t }}</div></sc-for>
+</div>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:22px;min-width:0">
+<div><h2 style="font-size:28px;margin:0 0 8px">Choose where your code lives</h2><p style="color:#9397ab;font-size:14px;line-height:1.55;margin:0;max-width:560px">GitPilot searches this folder for Git repositories and reads the author name and email each one uses.</p></div>
+<div style="display:flex;gap:10px;max-width:640px"><div style="flex:1;height:36px;border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;gap:10px;padding:0 12px;font:400 13px 'JetBrains Mono'"><i class="ph ph-folder-simple" style="font-size:16px;color:#75798c"></i>~/dev</div><div style="height:36px;border-radius:8px;display:flex;align-items:center;padding:0 16px;box-shadow:0 0 0 1px #796cbf;color:#d2cefd">Browse…</div></div>
+<div style="display:flex;align-items:center;gap:10px;color:#62b98a"><i class="ph ph-check-circle" style="font-size:16px"></i><span style="color:#e9e9ed">Found 22 repositories</span><span style="color:#75798c">in 1.4 s</span></div>
+<div style="font-size:12px;color:#75798c;margin-top:4px">Identities detected</div>
+<div style="display:flex;flex-direction:column;max-width:640px;border-radius:8px;box-shadow:0 0 0 1px #292b31;overflow:hidden">
+<sc-for list="{{ foundIds }}" as="i" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:20px 1fr 90px 120px;align-items:center;gap:12px;height:48px;padding:0 16px;background:#1b1d2c;border-top:1px solid #232532"><span style="width:8px;height:8px;border-radius:2px;background:{{ i.c }}"></span><div><div style="font-weight:500">{{ i.n }}</div><div style="font:400 12px 'JetBrains Mono';color:#75798c">{{ i.e }}</div></div><span style="font:400 12px 'JetBrains Mono';color:#9397ab">{{ i.k }} repos</span><span style="font-size:12px;color:#b2b6ca;text-align:right">{{ i.r }}</span></div></sc-for>
+</div>
+<div style="color:#75798c;font-size:12px;max-width:640px;line-height:1.5">Rules match an identity by folder or remote URL. GitPilot suggested them from the folder names above; you can edit them later under Identity rules.</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;gap:16px"><div style="height:36px;border-radius:8px;display:flex;align-items:center;padding:0 16px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5">Back</div><div style="height:36px;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 18px;box-shadow:0 0 0 1px #9184d9;color:#e7e5fe;font-weight:500">Continue<i class="ph ph-arrow-right" style="font-size:15px"></i></div></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2d AI ENGINE -->
+<div id="2d" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2d</span><span style="color:#9397ab">Walkthrough 3 of 4: AI engine setup. Interactive: pick a runner and a model</span></div>
+<div style="width:1120px;height:720px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#111320;border-bottom:1px solid #232532"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span><span style="flex:1;text-align:center;color:#75798c">Set up GitPilot</span><span style="width:52px"></span></div>
+<div style="flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0">
+<div style="background:#111320;border-right:1px solid #232532;padding:32px 24px;display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:28px"><i class="ph-fill ph-compass" style="font-size:22px;color:#9184d9"></i><span style="font-size:16px;font-weight:500">GitPilot</span></div>
+<sc-for list="{{ railD }}" as="s" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;height:34px;color:{{ s.fg }}"><span style="width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px {{ s.ring }};background:{{ s.bg }};display:flex;align-items:center;justify-content:center;font:500 11px 'JetBrains Mono'"><i class="{{ s.icon }}" style="font-size:12px"></i>{{ s.num }}</span>{{ s.t }}</div></sc-for>
+</div>
+<div style="padding:44px 56px;display:flex;flex-direction:column;gap:18px;min-width:0">
+<div><h2 style="font-size:28px;margin:0 0 8px">Set up the local AI engine</h2><p style="color:#9397ab;font-size:14px;line-height:1.55;margin:0;max-width:600px">Commit messages and conflict suggestions are generated on this machine. Staged diffs and file contents are never sent anywhere. Choose what runs the model.</p></div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+<sc-for list="{{ runners }}" as="r" hint-placeholder-count="4">
+<div onClick="{{ r.pick }}" style="border-radius:8px;padding:12px 14px;cursor:pointer;background:{{ r.bg }};box-shadow:0 0 0 1px {{ r.ring }};display:flex;gap:12px">
+<span style="width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1px {{ r.dotRing }};display:flex;align-items:center;justify-content:center;margin-top:2px;flex:none"><span style="width:8px;height:8px;border-radius:50%;background:{{ r.dot }}"></span></span>
+<div style="min-width:0"><div style="display:flex;align-items:center;gap:8px;font-weight:500">{{ r.n }}<span style="font-size:11px;font-weight:400;color:{{ r.tc }};background:{{ r.tb }};border-radius:4px;padding:1px 6px">{{ r.tag }}</span></div><div style="color:#9397ab;font-size:12px;line-height:1.45;margin-top:3px">{{ r.d }}</div></div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;align-items:baseline;gap:12px;margin-top:4px"><span style="font-size:12px;color:#75798c">Model</span><span style="font-size:12px;color:#75798c">Detected Apple M2, 16 GB memory. All three fit.</span></div>
+<div style="display:flex;flex-direction:column;border-radius:8px;box-shadow:0 0 0 1px #292b31;overflow:hidden">
+<sc-for list="{{ models }}" as="m" hint-placeholder-count="3">
+<div onClick="{{ m.pick }}" style="display:grid;grid-template-columns:20px 1fr 90px 80px;align-items:center;gap:14px;height:54px;padding:0 16px;cursor:pointer;background:{{ m.bg }};border-top:1px solid #232532">
+<span style="width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1px {{ m.dotRing }};display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:50%;background:{{ m.dot }}"></span></span>
+<div><div style="display:flex;align-items:center;gap:8px;font-weight:500">{{ m.n }}<span style="font-size:11px;font-weight:400;color:#d2cefd;background:{{ m.tb }};border-radius:4px;padding:1px 6px">{{ m.tag }}</span></div><div style="color:#9397ab;font-size:12px;margin-top:1px">{{ m.d }}</div></div>
+<span style="font-size:12px;color:#b2b6ca">{{ m.speed }}</span><span style="font:400 12px 'JetBrains Mono';color:#cfd3e5;text-align:right">{{ m.size }}</span>
+</div>
+</sc-for>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;gap:16px"><div style="height:36px;border-radius:8px;display:flex;align-items:center;padding:0 16px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5">Back</div><div style="height:36px;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 18px;box-shadow:0 0 0 1px #9184d9;color:#e7e5fe;font-weight:500"><i class="ph ph-download-simple" style="font-size:15px"></i>{{ ctaText }}</div><span style="color:#75798c">Set up AI later</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2e DOWNLOAD -->
+<div id="2e" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2e</span><span style="color:#9397ab">Walkthrough 3 of 4: downloading. The tips carousel becomes a visible list of next steps</span></div>
+<div style="width:1120px;height:720px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#111320;border-bottom:1px solid #232532"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span><span style="flex:1;text-align:center;color:#75798c">Set up GitPilot</span><span style="width:52px"></span></div>
+<div style="flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0">
+<div style="background:#111320;border-right:1px solid #232532;padding:32px 24px;display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:28px"><i class="ph-fill ph-compass" style="font-size:22px;color:#9184d9"></i><span style="font-size:16px;font-weight:500">GitPilot</span></div>
+<sc-for list="{{ railD }}" as="s" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;height:34px;color:{{ s.fg }}"><span style="width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px {{ s.ring }};background:{{ s.bg }};display:flex;align-items:center;justify-content:center;font:500 11px 'JetBrains Mono'"><i class="{{ s.icon }}" style="font-size:12px"></i>{{ s.num }}</span>{{ s.t }}</div></sc-for>
+</div>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:26px;min-width:0">
+<div><h2 style="font-size:28px;margin:0 0 8px">Downloading Gemma 3 4B</h2><p style="color:#9397ab;font-size:14px;line-height:1.55;margin:0">One-time download. After this the engine works offline.</p></div>
+<div style="max-width:640px;display:flex;flex-direction:column;gap:10px">
+<div style="height:4px;border-radius:4px;background:#232532"><div style="width:62%;height:4px;border-radius:4px;background:#9184d9"></div></div>
+<div style="display:flex;justify-content:space-between;font:400 12px 'JetBrains Mono';color:#9397ab"><span>2.0 GB of 3.3 GB</span><span>38 MB/s · about 35 s left</span><span style="color:#e0706f">Cancel</span></div>
+</div>
+<div style="max-width:640px;display:flex;flex-direction:column;border-top:1px solid #232532">
+<sc-for list="{{ dlSteps }}" as="d" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;height:36px;border-bottom:1px solid #232532;color:{{ d.fg }}"><i class="{{ d.icon }}" style="font-size:16px;color:{{ d.ic }}"></i><span style="flex:1">{{ d.t }}</span><span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ d.m }}</span></div></sc-for>
+</div>
+<div style="font-size:12px;color:#75798c">While you wait</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:760px;margin-top:-14px">
+<sc-for list="{{ tips }}" as="t" hint-placeholder-count="3"><div style="border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31;padding:14px;display:flex;flex-direction:column;gap:6px"><i class="{{ t.i }}" style="font-size:18px;color:#9184d9"></i><div style="font-weight:500">{{ t.t }}</div><div style="color:#9397ab;font-size:12px;line-height:1.5">{{ t.d }}</div></div></sc-for>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2f READY -->
+<div id="2f" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2f</span><span style="color:#9397ab">Walkthrough 4 of 4: ready, with a live test of the engine</span></div>
+<div style="width:1120px;height:720px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#111320;border-bottom:1px solid #232532"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span><span style="flex:1;text-align:center;color:#75798c">Set up GitPilot</span><span style="width:52px"></span></div>
+<div style="flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0">
+<div style="background:#111320;border-right:1px solid #232532;padding:32px 24px;display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:28px"><i class="ph-fill ph-compass" style="font-size:22px;color:#9184d9"></i><span style="font-size:16px;font-weight:500">GitPilot</span></div>
+<sc-for list="{{ railF }}" as="s" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;height:34px;color:{{ s.fg }}"><span style="width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px {{ s.ring }};background:{{ s.bg }};display:flex;align-items:center;justify-content:center;font:500 11px 'JetBrains Mono'"><i class="{{ s.icon }}" style="font-size:12px"></i>{{ s.num }}</span>{{ s.t }}</div></sc-for>
+</div>
+<div style="padding:72px 80px;display:flex;flex-direction:column;gap:26px;background:radial-gradient(ellipse 480px 320px at 90% 0%,#17261f55,transparent)">
+<div style="display:flex;align-items:center;gap:14px"><i class="ph-fill ph-check-circle" style="font-size:34px;color:#62b98a"></i><h2 style="font-size:30px;margin:0">You are set up</h2></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:680px">
+<sc-for list="{{ summary }}" as="s" hint-placeholder-count="3"><div style="border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31;padding:14px"><div style="font-size:12px;color:#75798c">{{ s.k }}</div><div style="font-size:20px;font-weight:500;margin-top:4px">{{ s.v }}</div><div style="font:400 12px 'JetBrains Mono';color:#9397ab;margin-top:2px">{{ s.m }}</div></div></sc-for>
+</div>
+<div style="max-width:680px;border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #3f424d;padding:14px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#9397ab"><i class="ph ph-sparkle" style="font-size:14px;color:#9184d9"></i>Test prompt on a sample diff<span style="flex:1"></span><span style="font-family:'JetBrains Mono'">1.4 s</span></div>
+<div style="font:500 13px 'JetBrains Mono';color:#f3f5fe">feat(auth): add refresh-token rotation</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;gap:16px"><div style="height:38px;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 20px;box-shadow:0 0 0 1px #9184d9;color:#e7e5fe;font-weight:500">Open GitPilot</div><span style="color:#75798c">Change anything later in Settings</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2g MERGE -->
+<div id="2g" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2g</span><span style="color:#9397ab">Merge workspace, step 4 of 5 (resolve conflicts). Rebase uses the same layout. Replaces the modal wizard</span></div>
+<div style="width:1440px;height:900px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#111320;border-bottom:1px solid #232532"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span><span style="flex:1;text-align:center;color:#75798c">billing-service · Merge</span><span style="width:52px"></span></div>
+<div style="height:64px;flex:none;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid #232532">
+<i class="ph ph-x" style="font-size:16px;color:#9397ab"></i><i class="ph ph-git-merge" style="font-size:20px;color:#9184d9"></i>
+<span style="font-size:16px;font-weight:500">Merge</span><span style="font:400 12px 'JetBrains Mono';background:#232532;border-radius:5px;padding:3px 8px;color:#cfd3e5">feat/invoice-retry</span><i class="ph ph-arrow-right" style="color:#75798c"></i><span style="font:400 12px 'JetBrains Mono';background:#232532;border-radius:5px;padding:3px 8px;color:#cfd3e5">main</span>
+<span style="flex:1"></span>
+<div style="display:flex;align-items:center;gap:6px">
+<sc-for list="{{ mergeSteps }}" as="s" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:6px;color:{{ s.fg }}"><span style="width:18px;height:18px;border-radius:50%;box-shadow:0 0 0 1px {{ s.ring }};background:{{ s.bg }};display:flex;align-items:center;justify-content:center;font:500 10px 'JetBrains Mono'"><i class="{{ s.icon }}" style="font-size:11px"></i>{{ s.num }}</span>{{ s.t }}<span style="width:20px;height:1px;background:#3f424d;display:{{ s.line }}"></span></div></sc-for>
+</div>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0">
+<div style="background:#111320;border-right:1px solid #232532;display:flex;flex-direction:column">
+<div style="height:34px;display:flex;align-items:center;padding:0 14px;color:#9397ab;border-bottom:1px solid #1b1d2c">Conflicting files · 1 of 3 resolved</div>
+<sc-for list="{{ cfiles }}" as="f" hint-placeholder-count="3"><div style="height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;background:{{ f.bg }};box-shadow:inset 2px 0 0 {{ f.bar }}"><i class="{{ f.icon }}" style="font-size:16px;color:{{ f.ic }}"></i><div style="min-width:0"><div style="font:400 12px 'JetBrains Mono';color:#e9e9ed">{{ f.n }}</div><div style="font:400 11px 'JetBrains Mono';color:#75798c">{{ f.d }}</div></div></div></sc-for>
+<div style="flex:1"></div>
+<div style="margin:12px;padding:10px;border-radius:6px;background:#17261f;color:#62b98a;font-size:12px;line-height:1.5;display:flex;gap:8px"><i class="ph ph-shield-check" style="font-size:16px;margin-top:1px"></i><div>Backup created<div style="font:400 11px 'JetBrains Mono';color:#9397ab;margin-top:2px;word-break:break-all">backup/main-merge-20261017-1612</div></div></div>
+</div>
+<div style="display:flex;flex-direction:column;min-width:0;min-height:0">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid #232532"><span style="font:400 12px 'JetBrains Mono'"><span style="color:#75798c">src/invoices/</span>send.ts</span><span style="font-size:12px;color:#d9a24f;background:#2a2417;border-radius:4px;padding:1px 7px">1 conflict</span><span style="flex:1"></span><div style="height:26px;border-radius:6px;display:flex;align-items:center;gap:6px;padding:0 10px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5">Edit manually</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;flex:none">
+<div style="border-right:1px solid #232532"><div style="height:30px;display:flex;align-items:center;gap:8px;padding:0 16px;font-size:12px;color:#62b98a;background:#17261f66"><i class="ph ph-git-branch" style="font-size:14px"></i>Current · main</div>
+<div style="padding:8px 0;font:400 12.5px/22px 'JetBrains Mono'"><sc-for list="{{ ours }}" as="l" hint-placeholder-count="6"><div style="padding:0 16px;white-space:pre;background:{{ l.bg }};color:#cfd3e5">{{ l.t }}</div></sc-for></div></div>
+<div><div style="height:30px;display:flex;align-items:center;gap:8px;padding:0 16px;font-size:12px;color:#6f9ae0;background:#17202f88"><i class="ph ph-git-branch" style="font-size:14px"></i>Incoming · feat/invoice-retry</div>
+<div style="padding:8px 0;font:400 12.5px/22px 'JetBrains Mono'"><sc-for list="{{ theirs }}" as="l" hint-placeholder-count="6"><div style="padding:0 16px;white-space:pre;background:{{ l.bg }};color:#cfd3e5">{{ l.t }}</div></sc-for></div></div>
+</div>
+<div style="flex:1;border-top:1px solid #232532;background:#111320;display:flex;flex-direction:column;min-height:0">
+<div style="height:40px;flex:none;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid #1b1d2c"><i class="ph ph-sparkle" style="font-size:15px;color:#9184d9"></i><span style="font-weight:500">Suggested resolution</span><span style="font-size:11px;color:#62b98a;background:#17261f;border-radius:4px;padding:1px 7px">High confidence</span><span style="font:400 12px 'JetBrains Mono';color:#75798c">Gemma 3 4B · 2.1 s</span></div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 360px;min-height:0">
+<div style="padding:8px 0;font:400 12.5px/22px 'JetBrains Mono';overflow:hidden"><sc-for list="{{ result }}" as="l" hint-placeholder-count="6"><div style="padding:0 20px;white-space:pre;background:{{ l.bg }};color:#e9e9ed">{{ l.t }}</div></sc-for></div>
+<div style="border-left:1px solid #1b1d2c;padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:12px;color:#75798c">Reasoning</div>
+<div style="line-height:1.55;color:#b2b6ca">Both sides edit the same call. Main added the <span style="font-family:'JetBrains Mono';color:#e9e9ed">log.warn</span> line, the branch added the retry loop. The suggestion keeps both: the loop wraps the call and the warning is logged on each failed attempt.</div>
+<div style="flex:1"></div>
+<div style="height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 0 1px #9184d9;color:#e7e5fe;font-weight:500"><i class="ph ph-check" style="font-size:15px"></i>Accept suggestion</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5">Use current</div><div style="height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5">Use incoming</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div style="height:48px;flex:none;display:flex;align-items:center;gap:16px;padding:0 20px;background:#111320;border-top:1px solid #232532">
+<span style="color:#9397ab">Nothing is committed until every file is resolved. Aborting restores the pre-merge state.</span><span style="flex:1"></span>
+<div style="height:30px;border-radius:6px;display:flex;align-items:center;padding:0 14px;box-shadow:0 0 0 1px #e0706f;color:#e0706f">Abort merge</div>
+<div style="height:30px;border-radius:6px;display:flex;align-items:center;gap:8px;padding:0 14px;box-shadow:0 0 0 1px #3f424d;color:#75798c;opacity:.6">Finish merge<span style="font:400 11px 'JetBrains Mono'">2 files left</span></div>
+</div>
+</div>
+</div>
+
+<!-- 2h LIBRARY -->
+<div id="2h" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2h</span><span style="color:#9397ab">Library: audit log, backups and identity rules as in-app pages, not modals. Interactive: use the sidebar</span></div>
+<div style="width:1440px;height:900px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #3f424d,0 24px 64px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden">
+<div style="height:40px;flex:none;display:grid;grid-template-columns:1fr 440px 1fr;align-items:center;background:#111320;border-bottom:1px solid #232532;padding:0 14px">
+<div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:50%;background:#e0706f"></span><span style="width:12px;height:12px;border-radius:50%;background:#d9a24f"></span><span style="width:12px;height:12px;border-radius:50%;background:#62b98a"></span><span style="width:1px;height:16px;background:#292b31;margin:0 8px"></span><i class="ph-fill ph-compass" style="font-size:16px;color:#9184d9"></i><span style="font-weight:500">GitPilot</span></div>
+<div style="height:26px;border-radius:6px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31;display:flex;align-items:center;gap:8px;padding:0 10px;color:#75798c"><i class="ph ph-magnifying-glass" style="font-size:14px"></i><span style="flex:1">Search repos, branches, commands</span><span style="font:400 11px 'JetBrains Mono';border:1px solid #3f424d;border-radius:4px;padding:0 5px;color:#9397ab">⌘K</span></div>
+<div style="display:flex;align-items:center;justify-content:flex-end;gap:14px;color:#9397ab"><span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#62b98a"></span>Gemma 3 4B</span><i class="ph ph-gear" style="font-size:16px"></i></div>
+</div>
+<div style="flex:1;display:flex;min-height:0">
+<div style="width:232px;flex:none;background:#111320;border-right:1px solid #232532;display:flex;flex-direction:column;padding:14px 8px;gap:2px">
+<div style="height:30px;display:flex;align-items:center;gap:10px;padding:0 10px;color:#b2b6ca"><i class="ph ph-list-bullets" style="font-size:16px"></i>Repositories</div>
+<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#75798c;padding:14px 10px 6px">Library</div>
+<sc-for list="{{ libNav }}" as="n" hint-placeholder-count="3"><div onClick="{{ n.pick }}" style="height:30px;border-radius:6px;display:flex;align-items:center;gap:10px;padding:0 10px;cursor:pointer;background:{{ n.bg }};color:{{ n.fg }}" style-hover="background:#1b1d2c"><i class="{{ n.icon }}" style="font-size:16px"></i><span style="flex:1">{{ n.t }}</span></div></sc-for>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;min-width:0">
+
+<sc-if value="{{ vAudit }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;flex:1;min-height:0">
+<div style="height:56px;flex:none;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #232532"><h3 style="font-size:18px;margin:0">Audit log</h3><span style="color:#75798c">Identity operations and mismatch detections</span><span style="flex:1"></span><div style="display:flex;gap:2px;padding:2px;border-radius:8px;background:#1b1d2c;box-shadow:0 0 0 1px #292b31"><sc-for list="{{ auditFilters }}" as="f" hint-placeholder-count="4"><div style="height:24px;border-radius:6px;display:flex;align-items:center;padding:0 10px;background:{{ f.bg }};color:{{ f.fg }}">{{ f.t }}</div></sc-for></div><div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 11px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-export" style="font-size:15px"></i>Export CSV</div></div>
+<div style="height:28px;flex:none;display:grid;grid-template-columns:90px 120px 150px 200px 1fr;align-items:center;padding:0 24px;color:#75798c;font-size:12px;border-bottom:1px solid #232532"><span>When</span><span>Action</span><span>Identity</span><span>Repository</span><span>Details</span></div>
+<div style="flex:1;overflow:auto"><sc-for list="{{ audit }}" as="a" hint-placeholder-count="10"><div style="height:36px;display:grid;grid-template-columns:90px 120px 150px 200px 1fr;align-items:center;padding:0 24px;border-bottom:1px solid #1b1d2c"><span style="color:#75798c;font-size:12px">{{ a.w }}</span><span style="display:flex"><span style="font-size:12px;color:{{ a.c }};background:{{ a.bg }};border-radius:4px;padding:1px 8px">{{ a.a }}</span></span><span style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:{{ a.ic }}"></span>{{ a.i }}</span><span style="font:400 12px 'JetBrains Mono';color:#cfd3e5">{{ a.r }}</span><span style="color:#9397ab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.d }}</span></div></sc-for></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ vBackups }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;flex:1;min-height:0">
+<div style="height:56px;flex:none;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #232532"><h3 style="font-size:18px;margin:0">Backups</h3><span style="color:#75798c">Safety branches created before merge and rebase</span><span style="flex:1"></span><div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:8px;padding:0 10px;box-shadow:0 0 0 1px #3f424d"><span style="width:8px;height:8px;border-radius:2px;background:#9184d9"></span>billing-service<i class="ph ph-caret-down" style="font-size:12px;color:#75798c"></i></div><div style="height:28px;border-radius:6px;display:flex;align-items:center;gap:8px;padding:0 10px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5">Delete older than<span style="font:400 12px 'JetBrains Mono';background:#1b1d2c;border-radius:4px;padding:1px 8px">30</span>days</div></div>
+<div style="height:28px;flex:none;display:grid;grid-template-columns:110px 110px minmax(0,1fr) 100px 190px;align-items:center;padding:0 24px;color:#75798c;font-size:12px;border-bottom:1px solid #232532"><span>Operation</span><span>Commit</span><span>Backup branch</span><span>Created</span><span style="text-align:right">Restore</span></div>
+<sc-for list="{{ backups }}" as="b" hint-placeholder-count="4"><div style="height:40px;display:grid;grid-template-columns:110px 110px minmax(0,1fr) 100px 190px;align-items:center;padding:0 24px;border-bottom:1px solid #1b1d2c"><span style="display:flex"><span style="font-size:12px;color:#6f9ae0;background:#17202f;border-radius:4px;padding:1px 8px">{{ b.o }}</span></span><span style="font:400 12px 'JetBrains Mono';color:#9397ab">{{ b.h }}</span><span style="font:400 12px 'JetBrains Mono';color:#cfd3e5">{{ b.n }}</span><span style="color:#75798c;font-size:12px">{{ b.w }}</span><span style="display:flex;justify-content:flex-end;gap:8px;align-items:center"><span style="display:{{ b.confirm }};font-size:12px;color:#9397ab">Replaces current branch</span><span style="height:24px;border-radius:5px;display:flex;align-items:center;padding:0 10px;box-shadow:0 0 0 1px {{ b.rc }};color:{{ b.rf }}">{{ b.rt }}</span></span></div></sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ vIdent }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:340px 1fr;flex:1;min-height:0">
+<div style="border-right:1px solid #232532;display:flex;flex-direction:column">
+<div style="height:56px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid #232532"><h3 style="font-size:18px;margin:0">Identities</h3><span style="flex:1"></span><div style="height:26px;border-radius:6px;display:flex;align-items:center;gap:6px;padding:0 10px;box-shadow:0 0 0 1px #796cbf;color:#d2cefd"><i class="ph ph-plus" style="font-size:13px"></i>Add</div></div>
+<sc-for list="{{ idList }}" as="i" hint-placeholder-count="3"><div style="height:60px;display:flex;align-items:center;gap:12px;padding:0 20px;background:{{ i.bg }};box-shadow:inset 2px 0 0 {{ i.bar }};border-bottom:1px solid #1b1d2c"><span style="width:8px;height:8px;border-radius:2px;background:{{ i.c }}"></span><div style="flex:1"><div style="font-weight:500">{{ i.n }}</div><div style="font:400 12px 'JetBrains Mono';color:#75798c">{{ i.e }}</div></div><span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ i.k }}</span></div></sc-for>
+</div>
+<div style="padding:24px 32px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:10px;height:10px;border-radius:2px;background:#9184d9"></span><h3 style="font-size:20px;margin:0">Work</h3><span style="flex:1"></span><span style="color:#d9a24f;display:flex;align-items:center;gap:6px"><i class="ph-fill ph-warning" style="font-size:14px"></i>1 mismatch</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px"><div><div style="font-size:12px;color:#75798c;margin-bottom:5px">Git name</div><div style="height:34px;border-radius:6px;background:#1b1d2c;box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;padding:0 12px">Krishna R</div></div><div><div style="font-size:12px;color:#75798c;margin-bottom:5px">Git email</div><div style="height:34px;border-radius:6px;background:#1b1d2c;box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;padding:0 12px;font-family:'JetBrains Mono'">krishna@acme.com</div></div></div>
+<div style="font-size:12px;color:#75798c;margin-top:6px">Rules: a repo uses this identity when it matches any rule</div>
+<div style="max-width:640px;border-radius:8px;box-shadow:0 0 0 1px #292b31;overflow:hidden"><sc-for list="{{ rules }}" as="r" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:90px 1fr 80px 24px;align-items:center;gap:12px;height:40px;padding:0 14px;background:#1b1d2c;border-top:1px solid #232532"><span style="color:#9397ab">{{ r.k }}</span><span style="font:400 12px 'JetBrains Mono'">{{ r.v }}</span><span style="font:400 12px 'JetBrains Mono';color:#75798c">{{ r.m }} repos</span><i class="ph ph-x" style="font-size:13px;color:#75798c"></i></div></sc-for></div>
+<div style="height:30px;width:120px;border-radius:6px;display:flex;align-items:center;gap:6px;padding:0 12px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-plus" style="font-size:13px"></i>Add rule</div>
+<div style="max-width:640px;border-radius:8px;background:#2a2417;color:#d9a24f;padding:12px 14px;line-height:1.5;display:flex;gap:10px"><i class="ph ph-warning" style="font-size:16px;margin-top:1px"></i><div><span style="font-family:'JetBrains Mono'">payments-sdk</span> matches this identity but is configured with krishna.dev@gmail.com.<div style="margin-top:6px;color:#e9e9ed;text-decoration:underline">Apply Work identity to this repo</div></div></div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</div>
+</div>
+
+<!-- 2i POPOVER + TRAY -->
+<div id="2i" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><span style="font:500 12px 'JetBrains Mono';color:#b5abfc;border:1px solid #5d5294;border-radius:4px;padding:2px 8px">2i</span><span style="color:#9397ab">AI engine menu (title bar) and operation tray (push, pull, errors)</span></div>
+<div style="display:flex;gap:40px;align-items:flex-start;width:1100px;padding:32px;border-radius:12px;background:#161826;box-shadow:0 0 0 1px #292b31">
+<div style="width:420px;border-radius:12px;background:#1b1d2c;box-shadow:0 0 0 1px #595d6c,0 16px 40px rgba(0,0,0,.65);overflow:hidden">
+<div style="padding:14px 16px;border-bottom:1px solid #292b31;display:flex;align-items:center;gap:10px"><span style="width:7px;height:7px;border-radius:50%;background:#62b98a"></span><div style="flex:1"><div style="font-weight:500">AI engine</div><div style="font-size:12px;color:#75798c">Running · GitPilot Engine</div></div><div style="height:26px;border-radius:6px;display:flex;align-items:center;gap:6px;padding:0 10px;box-shadow:0 0 0 1px #3f424d;color:#cfd3e5"><i class="ph ph-play" style="font-size:12px"></i>Test</div></div>
+<div style="padding:12px 16px;border-bottom:1px solid #292b31;display:flex;align-items:center;gap:10px"><span style="color:#75798c;font-size:12px">Runner</span><span style="flex:1"></span><span style="display:flex;align-items:center;gap:6px;height:26px;border-radius:6px;padding:0 10px;box-shadow:0 0 0 1px #3f424d">GitPilot Engine (built-in)<i class="ph ph-caret-down" style="font-size:11px;color:#75798c"></i></span></div>
+<sc-for list="{{ popModels }}" as="m" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:{{ m.bg }};border-bottom:1px solid #232532"><div style="flex:1"><div style="font-weight:500">{{ m.n }}</div><div style="font-size:12px;color:#75798c">{{ m.d }}</div></div><span style="height:24px;border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:12px;box-shadow:0 0 0 1px {{ m.rc }};color:{{ m.rf }}">{{ m.a }}</span></div></sc-for>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px">
+<div style="font-size:12px;color:#75798c">Operation tray, bottom right of the window</div>
+<sc-for list="{{ tray }}" as="t" hint-placeholder-count="3"><div style="border-radius:10px;background:#1b1d2c;box-shadow:0 0 0 1px {{ t.ring }},0 8px 24px rgba(0,0,0,.5);padding:12px 14px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px"><i class="{{ t.icon }}" style="font-size:17px;color:{{ t.c }}"></i><div style="flex:1;min-width:0"><div style="font-weight:500">{{ t.t }}</div><div style="font:400 12px 'JetBrains Mono';color:#75798c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.m }}</div></div><span style="font-size:12px;color:#b2b6ca;display:{{ t.actShow }}">{{ t.act }}</span></div><div style="height:3px;border-radius:3px;background:#232532;display:{{ t.barShow }}"><div style="width:64%;height:3px;border-radius:3px;background:#9184d9"></div></div></div></sc-for>
+</div>
+</div>
+</div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { runner: 0, model: 1, view: 'audit' };
+  rail(cur) {
+    const t = ['Welcome', 'Repos and identities', 'AI engine', 'Ready'];
+    return t.map((x, i) => ({
+      t: x, num: i < cur ? '' : String(i + 1), icon: i < cur ? 'ph ph-check' : '',
+      fg: i === cur ? '#f3f5fe' : i < cur ? '#b2b6ca' : '#75798c',
+      ring: i === cur ? '#9184d9' : i < cur ? '#62b98a' : '#3f424d',
+      bg: i < cur ? '#17261f' : i === cur ? '#2b2741' : 'transparent'
+    }));
+  }
+  renderVals() {
+    const st = this.state, s = o => this.setState(o);
+    const boot = [
+      ['Loading settings', 'ph ph-check-circle', '#62b98a', '#b2b6ca', '12 ms'],
+      ['Opening local database', 'ph ph-check-circle', '#62b98a', '#b2b6ca', '41 ms'],
+      ['Reading identities', 'ph ph-check-circle', '#62b98a', '#b2b6ca', '3 found'],
+      ['Scanning ~/dev', 'ph ph-circle-notch', '#9184d9', '#f3f5fe', '14 / 22'],
+      ['Starting AI engine', 'ph ph-circle', '#3f424d', '#75798c', '']
+    ].map(b => ({ t: b[0], icon: b[1], ic: b[2], fg: b[3], m: b[4] }));
+    const features = [
+      { i: 'ph ph-users-three', t: 'Identity management', d: 'Manage multiple Git identities across repos. Automatically match the right name and email based on path or remote.' },
+      { i: 'ph ph-sparkle', t: 'AI-powered commits', d: 'Generate meaningful commit messages from your staged changes using a local AI model. No cloud, no API keys.' },
+      { i: 'ph ph-git-merge', t: 'Safe merge and rebase', d: 'Preview merges before executing. Auto-backup branches and use AI to resolve conflicts when they arise.' },
+      { i: 'ph ph-list-bullets', t: 'Repo dashboard', d: 'Scan a folder and see all repos at a glance. Filter by status, search, and jump into any repository instantly.' }
+    ];
+    const foundIds = [
+      { n: 'Work', e: 'krishna@acme.com', c: '#9184d9', k: 10, r: '~/dev/work/acme' },
+      { n: 'Personal', e: 'krishna.dev@gmail.com', c: '#6bb5a6', k: 8, r: '~/dev/personal' },
+      { n: 'Freelance', e: 'hello@krishna.studio', c: '#c79a8a', k: 4, r: '~/dev/clients' }
+    ];
+    const rn = [
+      ['GitPilot Engine', 'Built-in', 'Bundled runtime. Nothing else to install; the simplest option.', 'Recommended'],
+      ['Ollama', 'Detected', 'Found at localhost:11434 with 3 models already pulled.', 'Detected'],
+      ['LM Studio', 'Not running', 'Start the LM Studio local server to use its models.', 'Not running'],
+      ['Custom endpoint', 'Advanced', 'Any OpenAI-compatible URL on your machine or network.', 'Advanced']
+    ];
+    const runners = rn.map((r, i) => {
+      const a = st.runner === i;
+      return { n: r[0], d: r[2], tag: r[3], pick: () => s({ runner: i }), bg: a ? '#2b274155' : '#1b1d2c', ring: a ? '#9184d9' : '#292b31', dotRing: a ? '#9184d9' : '#595d6c', dot: a ? '#9184d9' : 'transparent',
+        tc: i === 0 ? '#d2cefd' : i === 1 ? '#62b98a' : '#9397ab', tb: i === 0 ? '#2b2741' : i === 1 ? '#17261f' : '#232532' };
+    });
+    const md = [
+      ['Gemma 3 1B', 'Short commit messages, lowest memory use.', 'Fastest', '0.8 GB', ''],
+      ['Gemma 3 4B', 'Good message quality and conflict suggestions.', 'Balanced', '3.3 GB', 'Recommended'],
+      ['Gemma 3 12B', 'Best quality for large diffs and merges.', 'Slower', '8.1 GB', '']
+    ];
+    const models = md.map((m, i) => {
+      const a = st.model === i;
+      return { n: m[0], d: m[1], speed: m[2], size: m[3], tag: m[4], tb: m[4] ? '#2b2741' : 'transparent', pick: () => s({ model: i }), bg: a ? '#2b274155' : '#1b1d2c', dotRing: a ? '#9184d9' : '#595d6c', dot: a ? '#9184d9' : 'transparent' };
+    });
+    const ctaText = st.runner === 0 ? `Download ${md[st.model][0]} (${md[st.model][3]})` : st.runner === 1 ? 'Use Ollama' : st.runner === 2 ? 'Check LM Studio again' : 'Connect endpoint';
+    const dlSteps = [
+      ['Download model', 'ph ph-circle-notch', '#9184d9', '#f3f5fe', '62%'],
+      ['Verify checksum', 'ph ph-circle', '#3f424d', '#75798c', ''],
+      ['Start engine', 'ph ph-circle', '#3f424d', '#75798c', ''],
+      ['Run a test prompt', 'ph ph-circle', '#3f424d', '#75798c', '']
+    ].map(d => ({ t: d[0], icon: d[1], ic: d[2], fg: d[3], m: d[4] }));
+    const tips = [
+      { i: 'ph ph-magnifying-glass', t: 'Press ⌘K', d: 'Jump to any repo, branch or command without leaving the keyboard.' },
+      { i: 'ph ph-users-three', t: 'Identity rules', d: 'Match identities by folder or remote URL so commits use the right email.' },
+      { i: 'ph ph-shield-check', t: 'Automatic backups', d: 'Merge and rebase create a backup branch first. Restore it from Library.' }
+    ];
+    const summary = [
+      { k: 'Repositories', v: '22', m: '~/dev' }, { k: 'Identities', v: '3', m: '1 mismatch found' }, { k: 'AI engine', v: 'Gemma 3 4B', m: 'GitPilot Engine' }
+    ];
+    const mst = ['Choose', 'Preview', 'Backup', 'Resolve', 'Finish'];
+    const mergeSteps = mst.map((t, i) => ({ t, num: i < 3 ? '' : String(i + 1), icon: i < 3 ? 'ph ph-check' : '', fg: i === 3 ? '#f3f5fe' : i < 3 ? '#b2b6ca' : '#75798c', ring: i === 3 ? '#9184d9' : i < 3 ? '#62b98a' : '#3f424d', bg: i < 3 ? '#17261f' : i === 3 ? '#2b2741' : 'transparent', line: i < 4 ? 'block' : 'none' }));
+    const cfiles = [
+      { n: 'send.ts', d: 'src/invoices/', icon: 'ph-fill ph-lightning', ic: '#e0706f', bg: '#2b274199', bar: '#9184d9' },
+      { n: 'worker.ts', d: 'src/queue/', icon: 'ph-fill ph-lightning', ic: '#e0706f', bg: 'transparent', bar: 'transparent' },
+      { n: 'package.json', d: '', icon: 'ph-fill ph-check-circle', ic: '#62b98a', bg: 'transparent', bar: 'transparent' }
+    ];
+    const Ln = (t, k) => ({ t, bg: k === 'g' ? '#17261f' : k === 'b' ? '#17202f' : 'transparent' });
+    const ours = [Ln('async function send(inv: Invoice) {'), Ln('  log.warn("sending", inv.id);', 'g'), Ln('  const res = await smtp.send(inv.mail);', 'g'), Ln('  return res.ok;'), Ln('}')];
+    const theirs = [Ln('async function send(inv: Invoice) {'), Ln('  for (let n = 0; n < MAX; n++) {', 'b'), Ln('    const res = await smtp.send(inv.mail);', 'b'), Ln('    if (res.ok) return true;', 'b'), Ln('  }'), Ln('}')];
+    const result = [Ln('async function send(inv: Invoice) {'), Ln('  for (let n = 0; n < MAX; n++) {', 'g'), Ln('    log.warn("sending", inv.id, { attempt: n });', 'g'), Ln('    const res = await smtp.send(inv.mail);', 'g'), Ln('    if (res.ok) return true;', 'g'), Ln('  }'), Ln('  return false;'), Ln('}')];
+    const lib = [['audit', 'Audit log', 'ph ph-clock-counter-clockwise'], ['backups', 'Backups', 'ph ph-archive'], ['ident', 'Identity rules', 'ph ph-identification-card']];
+    const libNav = lib.map(l => ({ t: l[1], icon: l[2], pick: () => s({ view: l[0] }), bg: st.view === l[0] ? '#2b2741' : 'transparent', fg: st.view === l[0] ? '#f5f4ff' : '#b2b6ca' }));
+    const af = ['All', 'Applied', 'Mismatch', 'Created', 'Rules'].map((t, i) => ({ t, bg: i === 0 ? '#2b2741' : 'transparent', fg: i === 0 ? '#e7e5fe' : '#b2b6ca' }));
+    const A = { Applied: ['#62b98a', '#17261f'], Mismatch: ['#d9a24f', '#2a2417'], Created: ['#6f9ae0', '#17202f'], Deleted: ['#e0706f', '#2a1c20'], 'Rule added': ['#b5abfc', '#2b2741'], 'Rule removed': ['#c79a8a', '#2a2020'] };
+    const IC = { Work: '#9184d9', Personal: '#6bb5a6', Freelance: '#c79a8a', '': '#3f424d' };
+    const audit = [
+      ['2m ago', 'Applied', 'Work', 'billing-service', 'Set krishna@acme.com from path rule ~/dev/work/acme/**'],
+      ['14m ago', 'Mismatch', 'Work', 'payments-sdk', 'Repo email krishna.dev@gmail.com does not match Work'],
+      ['1h ago', 'Rule added', 'Freelance', '', 'Remote contains github.com/krishna-studio'],
+      ['3h ago', 'Created', 'Freelance', '', 'hello@krishna.studio'],
+      ['1d ago', 'Applied', 'Personal', 'dotfiles', 'Set krishna.dev@gmail.com from path rule ~/dev/personal/**'],
+      ['1d ago', 'Mismatch', 'Freelance', 'invoice-tool', 'Repo email krishna@acme.com does not match Freelance'],
+      ['2d ago', 'Deleted', '', '', 'Removed identity "Contract (old)"'],
+      ['3d ago', 'Rule removed', 'Work', '', 'Path ~/dev/old-work/**'],
+      ['3d ago', 'Applied', 'Work', 'web-app', 'Set krishna@acme.com from remote rule github.com/acme-corp/*'],
+      ['5d ago', 'Applied', 'Personal', 'blog', 'Set krishna.dev@gmail.com from path rule ~/dev/personal/**']
+    ].map(a => ({ w: a[0], a: a[1], c: A[a[1]][0], bg: A[a[1]][1], i: a[2] || 'None', ic: IC[a[2]], r: a[3] || '', d: a[4] }));
+    const backups = [
+      ['merge', '4f9a1c2e', 'backup/main-merge-20261017-1612', '4m ago', 0],
+      ['rebase', 'b7720de1', 'backup/feat-invoice-retry-rebase-20261016', '1d ago', 1],
+      ['merge', '91c3a05f', 'backup/main-merge-20261011-0930', '6d ago', 0],
+      ['rebase', '0ad4e8b6', 'backup/develop-rebase-20260925-1704', '3w ago', 0]
+    ].map(b => ({ o: b[0], h: b[1], n: b[2], w: b[3], confirm: b[4] ? 'block' : 'none', rt: b[4] ? 'Confirm restore' : 'Restore', rc: b[4] ? '#e0706f' : '#796cbf', rf: b[4] ? '#e0706f' : '#d2cefd' }));
+    const idList = [
+      { n: 'Work', e: 'krishna@acme.com', c: '#9184d9', k: '10 repos', bg: '#2b274166', bar: '#9184d9' },
+      { n: 'Personal', e: 'krishna.dev@gmail.com', c: '#6bb5a6', k: '8 repos', bg: 'transparent', bar: 'transparent' },
+      { n: 'Freelance', e: 'hello@krishna.studio', c: '#c79a8a', k: '4 repos', bg: 'transparent', bar: 'transparent' }
+    ];
+    const rules = [{ k: 'Folder', v: '~/dev/work/acme/**', m: 9 }, { k: 'Remote', v: 'github.com/acme-corp/*', m: 10 }, { k: 'Remote', v: 'gitlab.acme.io/**', m: 2 }];
+    const popModels = [
+      { n: 'Gemma 3 4B', d: '3.3 GB · Balanced', a: 'In use', bg: '#2b274166', rc: 'transparent', rf: '#b5abfc' },
+      { n: 'Gemma 3 1B', d: '0.8 GB · Fastest', a: 'Use', bg: 'transparent', rc: '#796cbf', rf: '#d2cefd' },
+      { n: 'Gemma 3 12B', d: '8.1 GB · Slower', a: 'Download', bg: 'transparent', rc: '#3f424d', rf: '#cfd3e5' }
+    ];
+    const tray = [
+      { icon: 'ph ph-arrow-up', c: '#9184d9', t: 'Pushing billing-service', m: 'feat/invoice-retry · uploading objects 64%', ring: '#3f424d', act: 'Cancel', actShow: 'block', barShow: 'block' },
+      { icon: 'ph-fill ph-check-circle', c: '#62b98a', t: 'Pulled web-app', m: 'main · 3 commits, fast-forward', ring: '#3f424d', act: '', actShow: 'none', barShow: 'none' },
+      { icon: 'ph-fill ph-x-circle', c: '#e0706f', t: 'Push failed: auth-gateway', m: 'rejected (non-fast-forward). Pull first.', ring: '#e0706f', act: 'Pull and retry', actShow: 'block', barShow: 'none' }
+    ];
+    return { boot, features, foundIds, runners, models, ctaText, dlSteps, tips, summary, mergeSteps, cfiles, ours, theirs, result, libNav, auditFilters: af, audit, backups, idList, rules, popModels, tray,
+      railB: this.rail(0), railC: this.rail(1), railD: this.rail(2), railF: this.rail(4),
+      vAudit: st.view === 'audit', vBackups: st.view === 'backups', vIdent: st.view === 'ident' };
+  }
+}
+</script>
+</body>
+</html>
