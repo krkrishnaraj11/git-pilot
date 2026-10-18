@@ -1,5 +1,7 @@
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useAppStore } from "@/stores/app-store";
 import { useEffect, useRef, useState } from "react";
+import { Kbd } from "./ui";
 
 export function SearchModal() {
   const searchQuery = useAppStore((s) => s.searchQuery);
@@ -100,44 +102,14 @@ export function SearchModal() {
 
   return (
     <>
-      {/* Search trigger button — placed in FilterBar area */}
+      {/* Search trigger — field-style, placed in the title bar */}
       <button
         onClick={open}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "7px 14px",
-          fontSize: "13px",
-          fontWeight: 600,
-          color: "var(--color-gp-text-tertiary)",
-          background: "transparent",
-          border: "1px solid rgba(255,255,255,0.06)",
-          borderRadius: "10px",
-          cursor: "pointer",
-          transition: "all 0.15s ease",
-        }}
+        className="flex h-8 w-64 items-center gap-2 rounded-md border border-border-2 bg-surface px-3 text-[13px] text-muted transition-colors hover:border-accent/50"
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.3-4.3" />
-        </svg>
-        Search
-        <kbd
-          style={{
-            marginLeft: "4px",
-            padding: "1px 6px",
-            fontSize: "10px",
-            fontFamily: "monospace",
-            fontWeight: 600,
-            color: "var(--color-gp-text-tertiary)",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "4px",
-          }}
-        >
-          ⌘F
-        </kbd>
+        <MagnifyingGlass size={13} className="shrink-0" />
+        <span className="flex-1 truncate text-left">Search or run a command…</span>
+        <Kbd>⌘K</Kbd>
       </button>
 
       {/* Modal overlay */}

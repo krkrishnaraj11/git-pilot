@@ -1,130 +1,90 @@
-import { useEffect, useState } from "react";
+import { ArrowsClockwise, GearSix, GitBranch, Minus, Square, X } from "@phosphor-icons/react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useAppStore } from "@/stores/app-store";
 import { AiStatusIndicator } from "./AiStatusIndicator";
+import { SearchModal } from "./SearchInput";
+import { IconButton } from "./ui";
 
-interface TitleBarProps {
-  onManageClick?: () => void;
+const isMac = /Mac/i.test(navigator.platform || navigator.userAgent);
+
+function timeAgo(ts: number): string {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return "just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
 }
 
-const BTN_STYLE: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  padding: "8px 16px",
-  fontSize: "13px",
-  fontWeight: 600,
-  color: "var(--color-gp-text-secondary)",
-  background: "var(--color-gp-surface-2)",
-  border: "1px solid rgba(255,255,255,0.06)",
-  borderRadius: "10px",
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-};
+function WindowControls() {
+  const win = getCurrentWindow();
+  return (
+    <div className="flex items-center gap-0.5">
+      <IconButton size="sm" aria-label="Minimize window" onClick={() => win.minimize()}>
+        <Minus size={12} />
+      </IconButton>
+      <IconButton size="sm" aria-label="Maximize window" onClick={() => win.toggleMaximize()}>
+        <Square size={10} />
+      </IconButton>
+      <IconButton size="sm" aria-label="Close window" className="hover:bg-tint-error hover:text-error" onClick={() => win.close()}>
+        <X size={12} />
+      </IconButton>
+    </div>
+  );
+}
 
-export function TitleBar({ onManageClick }: TitleBarProps) {
-  const [time, setTime] = useState(new Date());
-  const pickFolder = useAppStore((s) => s.pickFolder);
+export function TitleBar() {
+  const lastScanAt = useAppStore((s) => s.lastScanAt);
+  const scanPath = useAppStore((s) => s.scanPath);
   const isScanning = useAppStore((s) => s.isScanning);
-
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const scanDirectory = useAppStore((s) => s.scanDirectory);
+  const setView = useAppStore((s) => s.setView);
 
   return (
     <header
       data-tauri-drag-region
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "14px 32px",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-        background: "var(--color-gp-surface-1)",
-      }}
+      className="flex h-10 shrink-0 items-center gap-3 border-b border-border bg-panel pr-3"
+      style={isMac ? { paddingLeft: 68 } : { paddingLeft: 12 }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "14px" }} data-tauri-drag-region>
-        <div
-          style={{
-            width: "36px",
-            height: "36px",
-            borderRadius: "10px",
-            background: "rgba(139, 92, 246, 0.12)",
-            border: "1px solid rgba(139, 92, 246, 0.2)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="18" cy="18" r="3" />
-            <circle cx="6" cy="6" r="3" />
-            <path d="M13 6h3a2 2 0 0 1 2 2v7" />
-            <line x1="6" y1="9" x2="6" y2="21" />
-          </svg>
+      {/* Logo + wordmark */}
+      <div data-tauri-drag-region className="flex items-center gap-2">
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-accent-tint">
+          <GitBranch size={13} weight="fill" className="text-accent-text" />
         </div>
-        <span style={{ fontSize: "16px", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--color-gp-text)" }}>
+        <span data-tauri-drag-region className="text-[13px] font-semibold tracking-[-0.01em] text-text">
           GitPilot
-        </span>
-        <span
-          style={{
-            padding: "3px 8px",
-            fontSize: "10px",
-            fontFamily: "monospace",
-            fontWeight: 700,
-            borderRadius: "6px",
-            background: "var(--color-gp-surface-2)",
-            color: "var(--color-gp-text-tertiary)",
-            border: "1px solid rgba(255,255,255,0.06)",
-            letterSpacing: "0.05em",
-          }}
-        >
-          v0.1.0
         </span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {/* Rescan */}
-        <button
-          onClick={() => pickFolder()}
-          disabled={isScanning}
-          style={{
-            ...BTN_STYLE,
-            opacity: isScanning ? 0.5 : 1,
-          }}
-        >
-          {isScanning ? (
-            <>
-              <div style={{ width: "14px", height: "14px", border: "2px solid rgba(139,92,246,0.3)", borderTopColor: "#8B5CF6", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
-              Scanning...
-            </>
-          ) : (
-            <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-              </svg>
-              Rescan
-            </>
-          )}
-        </button>
+      {/* Search / command (center) */}
+      <div className="flex min-w-0 flex-1 justify-center">
+        <SearchModal />
+      </div>
 
-        {/* Manage */}
-        {onManageClick && (
-          <button onClick={onManageClick} style={BTN_STYLE}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" y1="8" x2="19" y2="14" />
-              <line x1="22" y1="11" x2="16" y2="11" />
-            </svg>
-            Manage
+      {/* Right cluster */}
+      <div className="flex shrink-0 items-center gap-2">
+        <AiStatusIndicator />
+
+        {lastScanAt && scanPath && (
+          <button
+            onClick={() => scanDirectory(scanPath)}
+            disabled={isScanning}
+            className="flex h-7 items-center gap-1.5 rounded-md border border-transparent px-2 text-[11px] font-medium text-muted transition-colors hover:bg-surface-3 hover:text-text disabled:opacity-50"
+            title={`Rescan ${scanPath}`}
+          >
+            <ArrowsClockwise size={12} className={isScanning ? "animate-spin" : ""} />
+            {isScanning ? "Rescanning…" : `Rescanned ${timeAgo(lastScanAt)}`}
           </button>
         )}
-        <AiStatusIndicator />
-        <span style={{ fontSize: "12px", fontFamily: "monospace", color: "var(--color-gp-text-tertiary)" }}>
-          {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-        </span>
+
+        <IconButton aria-label="Settings" onClick={() => setView("settings")}>
+          <GearSix size={15} />
+        </IconButton>
+
+        {!isMac && <WindowControls />}
       </div>
     </header>
   );
 }
+

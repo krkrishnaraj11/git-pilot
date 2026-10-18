@@ -1,40 +1,23 @@
 import { useAppStore } from "@/stores/app-store";
+import { StatusDot } from "./ui";
 
 export function StatusBar() {
-  const scanPath = useAppStore((s) => s.scanPath);
-  const stats = useAppStore((s) => s.stats)();
-  const mismatches = useAppStore((s) => s.mismatches);
-  const setAuditLogOpen = useAppStore((s) => s.setAuditLogOpen);
+  const allRepos = useAppStore((s) => s.allRepos);
+  const scopedIdentities = useAppStore.getState().scopedIdentities();
+
+  const visibleRepos = scopedIdentities.reduce((n, i) => n + i.repos.length, 0);
 
   return (
-    <footer className="fixed bottom-0 inset-x-0 flex items-center justify-between px-10 py-3.5 bg-gp-surface-1 border-t border-gp-border text-[13px] font-mono z-50">
-      <div className="flex items-center gap-4">
-        {scanPath ? (
-          <span className="text-gp-text-tertiary truncate max-w-[400px]">
-            {scanPath}
-          </span>
-        ) : (
-          <span className="text-gp-text-tertiary">No folder scanned</span>
-        )}
-      </div>
+    <footer className="flex h-7 shrink-0 items-center justify-between border-t border-border bg-panel px-4 font-mono text-[11px]">
+      <span className="text-muted">
+        {visibleRepos} of {allRepos.length} repos
+      </span>
 
       <div className="flex items-center gap-4">
-        {mismatches.length > 0 && (
-          <span className="px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-wider uppercase bg-gp-warning/10 text-gp-warning border border-gp-warning/20">
-            {mismatches.length} Mismatch{mismatches.length !== 1 ? "es" : ""}
-          </span>
-        )}
-        <span className="text-gp-text-tertiary">
-          {stats.total} repo{stats.total !== 1 ? "s" : ""} indexed
-        </span>
-        <button
-          onClick={() => setAuditLogOpen(true)}
-          className="px-4 py-1.5 rounded-xl text-[11px] font-bold tracking-wider uppercase bg-gp-surface-2 text-gp-text-secondary border border-gp-border hover:bg-gp-surface-3 hover:text-gp-text transition-colors"
-        >
-          Activity
-        </button>
-        <span className="px-4 py-1.5 rounded-xl text-[11px] font-bold tracking-wider uppercase bg-gp-success/10 text-gp-success border border-gp-success/20">
-          Bank-Safe
+        <span className="hidden text-muted lg:block">↑↓ navigate · ⏎ open · C commit · P push</span>
+        <span className="flex items-center gap-1.5 text-muted">
+          <StatusDot tone="ok" />
+          Backups on
         </span>
       </div>
     </footer>

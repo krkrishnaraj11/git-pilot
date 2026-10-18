@@ -3,6 +3,8 @@ import { useSetupStore } from "@/stores/setup-store";
 import { cn } from "@/lib/utils";
 import type { UnlistenFn } from "@tauri-apps/api/event";
 
+const isMac = /Mac/i.test(navigator.platform || navigator.userAgent);
+
 // ─── Feature slides ─────────────────────────────────────────
 
 const FEATURES = [
@@ -461,8 +463,11 @@ export function SetupWizard() {
       {/* Ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gp-purple/[0.04] blur-[120px] pointer-events-none" />
 
-      {/* Step indicator */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+      {/* Drag region — the window is borderless, so provide one */}
+      <div data-tauri-drag-region className="absolute top-0 left-0 right-0 h-10 z-20" />
+
+      {/* Step indicator — offset below the native title bar on macOS (overlay) */}
+      <div className={cn("absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10", isMac ? "top-[48px]" : "top-6")}>
         {(["welcome", "features", "model-select", "downloading", "complete"] as const).map((step, i) => (
           <div
             key={step}

@@ -37,6 +37,12 @@ export interface InitStep {
   status: "pending" | "running" | "done" | "error";
 }
 
+/** Full-window views (the redesign has no modals for these) */
+export type AppView = "repositories" | "library-audit" | "library-backups" | "library-identities" | "settings";
+
+/** Sidebar identity scope — filters the repositories view */
+export type IdentityScope = { kind: "all" } | { kind: "identity"; id: string };
+
 interface AppState {
   identities: ScannedIdentity[];
   allRepos: RepoInfo[];
@@ -44,6 +50,13 @@ interface AppState {
   searchQuery: string;
   scanPath: string | null;
   isScanning: boolean;
+  lastScanAt: number | null;
+
+  // View routing (full-window pages, not modals)
+  view: AppView;
+
+  // Sidebar identity scope
+  identityScope: IdentityScope;
 
   // Initialization state
   isInitializing: boolean;
@@ -102,6 +115,8 @@ interface AppState {
   setFilter: (filter: FilterType) => void;
   setSearch: (query: string) => void;
   setScanPath: (path: string | null) => void;
+  setView: (view: AppView) => void;
+  setIdentityScope: (scope: IdentityScope) => void;
   scanDirectory: (path: string) => Promise<void>;
   pickFolder: () => Promise<void>;
 
@@ -176,6 +191,7 @@ interface AppState {
 
   // Computed
   filteredIdentities: () => ScannedIdentity[];
+  scopedIdentities: () => ScannedIdentity[];
   stats: () => {
     total: number;
     localChanges: number;
@@ -193,6 +209,13 @@ export const useAppStore = create<AppState>((set, get) => ({
   searchQuery: "",
   scanPath: null,
   isScanning: false,
+  lastScanAt: null,
+
+  // View routing
+  view: "repositories",
+
+  // Sidebar identity scope
+  identityScope: { kind: "all" },
 
   // Initialization state
   isInitializing: true,
@@ -242,6 +265,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   setFilter: (filter) => set({ activeFilter: filter }),
   setSearch: (query) => set({ searchQuery: query }),
   setScanPath: (path) => set({ scanPath: path }),
+  setView: (view) => set({ view }),
+  setIdentityScope: (scope) => set({ identityScope: scope }),
 
   scanDirectory: async (path: string) => {
     set({ isScanning: true, scanPath: path });
@@ -255,13 +280,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         identities: result.identities,
         mismatches: result.matches.filter((m) => m.is_mismatch),
         isScanning: false,
+        lastScanAt: Date.now(),
+        identityScope: { kind: "all" },
       });
     } catch (e) {
       console.error("Scan failed:", e);
       try {
         const repos = await invoke<RepoInfo[]>("scan_directory", { path });
         const identities = await invoke<ScannedIdentity[]>("get_identities", { repos });
-        set({ allRepos: repos, identities, isScanning: false });
+        set({ allRepos: repos, identities, isScanning: false, lastScanAt: Date.now(), identityScope: { kind: "all" } });
       } catch (e2) {
         console.error("Fallback scan also failed:", e2);
         set({ isScanning: false });
@@ -885,6 +912,24 @@ export const useAppStore = create<AppState>((set, get) => ({
         return { ...identity, repos: filteredRepos };
       })
       .filter((identity) => identity.repos.length > 0);
+  },
+
+  scopedIdentities: () => {
+    const { identities, activeFilter, searchQuery, identityScope } = get();
+    if (identityScope.kind === "all") return get().filteredIdentities();
+    const query = searchQuery.toLowerCase();
+    const identity = identities.find((i) => i.id === identityScope.id);
+    if (!identity) return [];
+    const filteredRepos = identity.repos.filter((repo) => {
+      const matchesFilter = activeFilter === "all" || repo.status === activeFilter;
+      const matchesSearch =
+        !query ||
+        repo.name.toLowerCase().includes(query) ||
+        repo.branch.toLowerCase().includes(query) ||
+        repo.language.toLowerCase().includes(query);
+      return matchesFilter && matchesSearch;
+    });
+    return filteredRepos.length > 0 ? [{ ...identity, repos: filteredRepos }] : [];
   },
 
   stats: () => {

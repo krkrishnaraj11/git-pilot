@@ -1,16 +1,14 @@
 import { useEffect } from "react";
-import { useAppStore } from "@/stores/app-store";
+import { useAppStore, type AppView } from "@/stores/app-store";
 import { useAiStore } from "@/stores/ai-store";
 import { useSetupStore } from "@/stores/setup-store";
 import { TitleBar } from "@/components/TitleBar";
-import { StatsStrip } from "@/components/StatsStrip";
+import { Sidebar } from "@/components/Sidebar";
 import { FilterBar } from "@/components/FilterBar";
-import { SearchModal } from "@/components/SearchInput";
 import { IdentitySection } from "@/components/IdentitySection";
 import { StatusBar } from "@/components/StatusBar";
 import { IdentityManager } from "@/components/IdentityManager";
 import { AuditLog } from "@/components/AuditLog";
-import { MismatchBanner } from "@/components/IdentityMismatchWarning";
 import { RepoDetail } from "@/components/RepoDetail";
 import { ToastContainer } from "@/components/ToastContainer";
 import { AiCommitPanel } from "@/components/AiCommitPanel";
@@ -19,6 +17,7 @@ import { BackupManager } from "@/components/BackupManager";
 import { SyncModal } from "@/components/SyncModal";
 import { SplashScreen } from "@/components/SplashScreen";
 import { SetupWizard } from "@/components/SetupWizard";
+import { Button, Panel } from "@/components/ui";
 
 function EmptyState() {
   const pickFolder = useAppStore((s) => s.pickFolder);
@@ -26,7 +25,7 @@ function EmptyState() {
 
   return (
     <div className="flex flex-col items-center justify-center h-full gap-5">
-      <div className="w-16 h-16 rounded-2xl bg-gp-surface-2 border border-gp-border flex items-center justify-center">
+      <div className="w-16 h-16 rounded-2xl bg-surface border border-border flex items-center justify-center">
         <svg
           width="28"
           height="28"
@@ -41,43 +40,85 @@ function EmptyState() {
         </svg>
       </div>
       <div className="text-center">
-        <p className="text-gp-text-secondary text-[13px] font-medium">
+        <p className="text-muted-2 text-[13px] font-medium">
           {isScanning ? "Scanning for repositories..." : "No repositories loaded"}
         </p>
-        <p className="text-gp-text-tertiary text-[11px] mt-1">
+        <p className="text-muted text-[11px] mt-1">
           {isScanning ? "This may take a moment" : "Select a folder to discover Git repositories"}
         </p>
       </div>
       {!isScanning && (
-        <button
-          onClick={pickFolder}
-          className="px-5 py-2.5 text-[13px] font-semibold bg-gp-purple text-white rounded-xl hover:bg-gp-purple/90 transition-all hover:shadow-lg hover:shadow-gp-purple/20"
-        >
+        <Button variant="primary" onClick={pickFolder}>
           Scan Folder
-        </button>
+        </Button>
       )}
       {isScanning && (
         <div className="flex items-center gap-2.5">
-          <div className="w-4 h-4 border-2 border-gp-purple/30 border-t-gp-purple rounded-full animate-spin" />
-          <span className="text-[11px] text-gp-text-tertiary font-mono">
-            Discovering repos...
-          </span>
+          <div className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+          <span className="text-[11px] text-muted font-mono">Discovering repos...</span>
         </div>
       )}
     </div>
   );
 }
 
+function RepositoriesView() {
+  const _identityScope = useAppStore((s) => s.identityScope);
+  const identities = useAppStore.getState().scopedIdentities();
+  const hasRepos = useAppStore((s) => s.allRepos.length > 0);
+
+  if (!hasRepos) return <EmptyState />;
+
+  if (identities.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted text-[13px]">No repos match current filters</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <FilterBar />
+      <div className="py-4">
+        {identities.map((identity) => (
+          <IdentitySection key={identity.id} identity={identity} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function PlaceholderPage({ title, note }: { title: string; note: string }) {
+  return (
+    <div className="flex h-full items-center justify-center">
+      <Panel className="w-[380px] p-10 text-center">
+        <h2 className="text-[15px] font-semibold text-text">{title}</h2>
+        <p className="mt-2 text-[13px] leading-relaxed text-muted">{note}</p>
+      </Panel>
+    </div>
+  );
+}
+
+function LibraryView({ view }: { view: AppView }) {
+  switch (view) {
+    case "library-audit":
+      return <PlaceholderPage title="Audit log" note="The full audit trail lands with the library pages — every identity switch, commit and push, timestamped." />;
+    case "library-backups":
+      return <PlaceholderPage title="Backups" note="Backup branches created before merges and rebases will live here, with one-click restore." />;
+    case "library-identities":
+      return <PlaceholderPage title="Identity rules" note="Manage identities, colors and matching rules (path prefixes, remote domains) from this page." />;
+    default:
+      return null;
+  }
+}
+
 function App() {
-  // Subscribe to filter/search/identities so component re-renders on changes
-  const _activeFilter = useAppStore((s) => s.activeFilter);
-  const _searchQuery = useAppStore((s) => s.searchQuery);
-  const _rawIdentities = useAppStore((s) => s.identities);
-  const identities = useAppStore.getState().filteredIdentities();
   const allRepos = useAppStore((s) => s.allRepos);
   const initializeApp = useAppStore((s) => s.initializeApp);
   const isInitializing = useAppStore((s) => s.isInitializing);
-  const setIdentityManagerOpen = useAppStore((s) => s.setIdentityManagerOpen);
+  const view = useAppStore((s) => s.view);
+
   const selectedRepo = useAppStore((s) => s.selectedRepo);
   const mergeWizardOpen = useAppStore((s) => s.mergeWizardOpen);
   const rebaseWizardOpen = useAppStore((s) => s.rebaseWizardOpen);
@@ -111,38 +152,22 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gp-bg">
-      <TitleBar onManageClick={() => setIdentityManagerOpen(true)} />
+    <div className="flex h-screen flex-col bg-ground">
+      <TitleBar />
 
-      {hasRepos && <StatsStrip />}
+      <div className="flex min-h-0 flex-1">
+        {hasRepos && <Sidebar />}
 
-      <MismatchBanner />
-
-      {hasRepos && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingRight: "32px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          <FilterBar />
-          <SearchModal />
-        </div>
-      )}
-
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto pb-16">
-        {!hasRepos ? (
-          <EmptyState />
-        ) : identities.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gp-text-tertiary text-[13px]">
-              No repos match current filters
-            </p>
-          </div>
-        ) : (
-          <div className="py-4">
-            {identities.map((identity) => (
-              <IdentitySection key={identity.id} identity={identity} />
-            ))}
-          </div>
-        )}
-      </main>
+        <main className="min-w-0 flex-1 overflow-y-auto">
+          {view === "repositories" ? (
+            <RepositoriesView />
+          ) : view === "settings" ? (
+            <PlaceholderPage title="Settings" note="AI engine, backup retention and general preferences will live here." />
+          ) : (
+            <LibraryView view={view} />
+          )}
+        </main>
+      </div>
 
       <StatusBar />
 
